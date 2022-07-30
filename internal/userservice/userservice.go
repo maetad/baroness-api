@@ -1,6 +1,10 @@
 package userservice
 
-type UserService struct{}
+import "gorm.io/gorm"
+
+type UserService struct {
+	db *gorm.DB
+}
 
 type UserServiceInterface interface {
 	Create(r UserCreateRequest) (*User, error)
@@ -17,6 +21,10 @@ func (u UserService) Create(r UserCreateRequest) (*User, error) {
 	}
 
 	user.SetPassword(r.Password)
+
+	if result := u.db.Create(user); result.Error != nil {
+		return nil, result.Error
+	}
 
 	return user, nil
 }
