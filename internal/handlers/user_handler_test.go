@@ -353,3 +353,210 @@ func TestUserHandler_Get(t *testing.T) {
 		})
 	}
 }
+
+func TestUserHandler_Update(t *testing.T) {
+	type fields struct {
+		log         *logrus.Entry
+		userservice userservice.UserServiceInterface
+	}
+	type args struct {
+		c *gin.Context
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   int
+	}{
+		{
+			name: "user update success",
+			fields: func() fields {
+				user := &userservice.User{}
+				u := &mocks.UserServiceInterface{}
+
+				u.On("Get", uint(1)).Return(user, nil)
+
+				u.On(
+					"Update",
+					user,
+					userservice.UserUpdateRequest{DisplayName: "display_name", Password: "password"},
+				).Return(&userservice.User{
+					DisplayName: "display_name",
+					Password:    "password",
+				}, nil)
+
+				return fields{
+					log:         logrus.WithContext(context.TODO()),
+					userservice: u,
+				}
+			}(),
+			args: func() args {
+				w := httptest.NewRecorder()
+				c, _ := gin.CreateTestContext(w)
+
+				c.Request = &http.Request{
+					URL:    &url.URL{},
+					Header: make(http.Header),
+					Body:   io.NopCloser(strings.NewReader(`{"display_name":"display_name","password":"password"}`)),
+				}
+
+				c.Params = gin.Params{
+					{
+						Key:   "id",
+						Value: "1",
+					},
+				}
+
+				return args{c}
+			}(),
+			want: http.StatusOK,
+		},
+		{
+			name: "user not found",
+			fields: func() fields {
+				u := &mocks.UserServiceInterface{}
+				u.On("Get", uint(1)).Return(nil, errors.New("user not found"))
+
+				return fields{
+					log:         logrus.WithContext(context.TODO()),
+					userservice: u,
+				}
+			}(),
+			args: func() args {
+				w := httptest.NewRecorder()
+				c, _ := gin.CreateTestContext(w)
+
+				c.Request = &http.Request{
+					URL:    &url.URL{},
+					Header: make(http.Header),
+					Body:   io.NopCloser(strings.NewReader(`{"display_name":"display_name","password":"password"}`)),
+				}
+
+				c.Params = gin.Params{
+					{
+						Key:   "id",
+						Value: "1",
+					},
+				}
+
+				return args{c}
+			}(),
+			want: http.StatusNotFound,
+		},
+		{
+			name: "body invalid",
+			fields: func() fields {
+				user := &userservice.User{}
+				u := &mocks.UserServiceInterface{}
+
+				u.On("Get", uint(1)).Return(user, nil)
+
+				return fields{
+					log:         logrus.WithContext(context.TODO()),
+					userservice: u,
+				}
+			}(),
+			args: func() args {
+				w := httptest.NewRecorder()
+				c, _ := gin.CreateTestContext(w)
+
+				c.Request = &http.Request{
+					URL:    &url.URL{},
+					Header: make(http.Header),
+					Body:   io.NopCloser(strings.NewReader(`{"display___name":"display_name","password":"password"}`)),
+				}
+
+				c.Params = gin.Params{
+					{
+						Key:   "id",
+						Value: "1",
+					},
+				}
+
+				return args{c}
+			}(),
+			want: http.StatusUnprocessableEntity,
+		},
+		{
+			name: "user update fail",
+			fields: func() fields {
+				user := &userservice.User{}
+				u := &mocks.UserServiceInterface{}
+
+				u.On("Get", uint(1)).Return(user, nil)
+
+				u.On(
+					"Update",
+					user,
+					userservice.UserUpdateRequest{DisplayName: "display_name", Password: "password"},
+				).Return(nil, errors.New("update fail"))
+
+				return fields{
+					log:         logrus.WithContext(context.TODO()),
+					userservice: u,
+				}
+			}(),
+			args: func() args {
+				w := httptest.NewRecorder()
+				c, _ := gin.CreateTestContext(w)
+
+				c.Request = &http.Request{
+					URL:    &url.URL{},
+					Header: make(http.Header),
+					Body:   io.NopCloser(strings.NewReader(`{"display_name":"display_name","password":"password"}`)),
+				}
+
+				c.Params = gin.Params{
+					{
+						Key:   "id",
+						Value: "1",
+					},
+				}
+
+				return args{c}
+			}(),
+			want: http.StatusInternalServerError,
+		},
+		{
+			name: "user id invalid",
+			fields: func() fields {
+				return fields{
+					log: logrus.WithContext(context.TODO()),
+				}
+			}(),
+			args: func() args {
+				w := httptest.NewRecorder()
+				c, _ := gin.CreateTestContext(w)
+
+				c.Request = &http.Request{
+					URL:    &url.URL{},
+					Header: make(http.Header),
+					Body:   io.NopCloser(strings.NewReader(`{"display_name":"display_name","password":"password"}`)),
+				}
+
+				c.Params = gin.Params{
+					{
+						Key:   "id",
+						Value: "one",
+					},
+				}
+
+				return args{c}
+			}(),
+			want: http.StatusNotFound,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			h := handlers.NewUserHandler(
+				tt.fields.log,
+				tt.fields.userservice,
+			)
+			h.Update(tt.args.c)
+
+			if tt.args.c.Writer.Status() != tt.want {
+				t.Errorf("Update() = %v, want %v", tt.args.c.Writer.Status(), tt.want)
+			}
+		})
+	}
+}
