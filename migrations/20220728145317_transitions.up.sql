@@ -5,8 +5,8 @@ CREATE TABLE IF NOT EXISTS "public"."transitions" (
   "parent_id" integer NOT NULL REFERENCES "public"."states"("id"),
   "target_id" integer NOT NULL REFERENCES "public"."states"("id"),
   "name" text NOT NULL,
-  "created_by" integer NOT NULL REFERENCES "public"."users"("id")
-  "updated_by" integer NOT NULL REFERENCES "public"."users"("id")
+  "created_by" integer NOT NULL REFERENCES "public"."users"("id"),
+  "updated_by" integer NOT NULL REFERENCES "public"."users"("id"),
   "deleted_by" integer NULL REFERENCES "public"."users"("id")
   "created_at" timestamp NOT NULL DEFAULT current_timestamp,
   "updated_at" timestamp NOT NULL DEFAULT current_timestamp,
