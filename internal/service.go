@@ -36,7 +36,6 @@ func New(
 		log.WithError(err).Fatal("db.DB()")
 	}
 
-	dbAutoMigration(sqlDB)
 	if err = dbAutoMigration(sqlDB); err != nil {
 		log.WithError(err).Fatal("dbAutoMigration()")
 	}
