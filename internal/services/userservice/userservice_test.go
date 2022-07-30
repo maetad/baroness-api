@@ -203,7 +203,7 @@ func TestUserService_List(t *testing.T) {
 			name: "listed success",
 			fields: func() fields {
 				db := &mocks.UserServiceDatabaseInterface{}
-				db.On("Find", mock.AnythingOfType("[]*userservice.User")).
+				db.On("Find", mock.Anything).
 					Return(&gorm.DB{
 						Error: nil,
 					})
@@ -216,7 +216,7 @@ func TestUserService_List(t *testing.T) {
 			name: "listed fail",
 			fields: func() fields {
 				db := &mocks.UserServiceDatabaseInterface{}
-				db.On("Find", mock.AnythingOfType("[]*userservice.User")).
+				db.On("Find", mock.Anything).
 					Return(&gorm.DB{
 						Error: errors.New("find error"),
 					})

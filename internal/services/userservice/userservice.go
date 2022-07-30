@@ -23,15 +23,15 @@ func New(db UserServiceDatabaseInterface) UserServiceInterface {
 }
 
 func (s UserService) List() ([]UserInterface, error) {
-	var users []*User
-	if result := s.db.Find(users); result.Error != nil {
+	var users []User
+	if result := s.db.Find(&users); result.Error != nil {
 		return nil, result.Error
 	}
 
 	var u = make([]UserInterface, len(users))
 
 	for i := 0; i < len(users); i++ {
-		u[i] = users[i]
+		u[i] = &users[i]
 	}
 
 	return u, nil

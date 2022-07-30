@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/pakkaparn/no-idea-api/internal/model"
 	"github.com/pakkaparn/no-idea-api/internal/services/userservice"
-	"gorm.io/gorm"
 )
 
 func TestUser_SetPassword(t *testing.T) {
@@ -92,7 +92,7 @@ func TestUser_ValidatePassword(t *testing.T) {
 
 func TestUser_GetClaims(t *testing.T) {
 	type fields struct {
-		Model       gorm.Model
+		Model       model.Model
 		Username    string
 		Password    string
 		DisplayName string
