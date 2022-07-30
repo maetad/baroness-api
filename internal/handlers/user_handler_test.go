@@ -13,6 +13,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/pakkaparn/no-idea-api/internal/handlers"
+	"github.com/pakkaparn/no-idea-api/internal/model"
 	"github.com/pakkaparn/no-idea-api/internal/services/userservice"
 	"github.com/pakkaparn/no-idea-api/mocks"
 	"github.com/sirupsen/logrus"
@@ -605,6 +606,8 @@ func TestUserHandler_Delete(t *testing.T) {
 					},
 				}
 
+				c.Set("user", &userservice.User{})
+
 				return args{c}
 			}(),
 			want: http.StatusNoContent,
@@ -635,6 +638,8 @@ func TestUserHandler_Delete(t *testing.T) {
 						Value: "1",
 					},
 				}
+
+				c.Set("user", &userservice.User{})
 
 				return args{c}
 			}(),
@@ -670,6 +675,8 @@ func TestUserHandler_Delete(t *testing.T) {
 					},
 				}
 
+				c.Set("user", &userservice.User{})
+
 				return args{c}
 			}(),
 			want: http.StatusInternalServerError,
@@ -697,9 +704,76 @@ func TestUserHandler_Delete(t *testing.T) {
 					},
 				}
 
+				c.Set("user", &userservice.User{})
+
 				return args{c}
 			}(),
 			want: http.StatusNotFound,
+		},
+		{
+			name: "current user is incorrect",
+			fields: func() fields {
+				return fields{
+					log: logrus.WithContext(context.TODO()),
+				}
+			}(),
+			args: func() args {
+				w := httptest.NewRecorder()
+				c, _ := gin.CreateTestContext(w)
+
+				c.Request = &http.Request{
+					URL:    &url.URL{},
+					Header: make(http.Header),
+				}
+
+				c.Params = gin.Params{
+					{
+						Key:   "id",
+						Value: "1",
+					},
+				}
+
+				c.Set("user", "1")
+
+				return args{c}
+			}(),
+			want: http.StatusUnauthorized,
+		},
+		{
+			name: "cannot suicide",
+			fields: func() fields {
+				user := &userservice.User{}
+				u := &mocks.UserServiceInterface{}
+
+				u.On("Get", uint(1)).Return(user, nil)
+				u.On("Delete", user).Return(nil)
+
+				return fields{
+					log:         logrus.WithContext(context.TODO()),
+					userservice: u,
+				}
+			}(),
+			args: func() args {
+				w := httptest.NewRecorder()
+				c, _ := gin.CreateTestContext(w)
+
+				c.Request = &http.Request{
+					URL:    &url.URL{},
+					Header: make(http.Header),
+				}
+
+				c.Params = gin.Params{
+					{
+						Key:   "id",
+						Value: "1",
+					},
+				}
+
+				c.Set("user", &userservice.User{Model: model.Model{ID: 1}})
+
+				return args{c}
+			}(),
+			want: http.StatusBadRequest,
 		},
 	}
 	for _, tt := range tests {
@@ -709,6 +783,10 @@ func TestUserHandler_Delete(t *testing.T) {
 				tt.fields.userservice,
 			)
 			h.Delete(tt.args.c)
+
+			if tt.args.c.Writer.Status() != tt.want {
+				t.Errorf("Delete() = %v, want %v", tt.args.c.Writer.Status(), tt.want)
+			}
 		})
 	}
 }
