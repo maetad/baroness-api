@@ -1,33 +1,34 @@
-package storageprovider
+package storageprovider_test
 
 import (
 	"reflect"
 	"testing"
 
 	"github.com/pakkaparn/no-idea-api/internal/config"
+	"github.com/pakkaparn/no-idea-api/internal/services/fileservice/storageprovider"
 )
 
 func TestNewProvider(t *testing.T) {
 	type args struct {
-		storage Provider
+		storage storageprovider.Provider
 		options config.Options
 	}
 	tests := []struct {
 		name string
 		args args
-		want StorageProvider
+		want storageprovider.StorageProvider
 	}{
 		{
 			name: "GCS",
 			args: args{
-				storage: GCS,
+				storage: storageprovider.GCS,
 			},
-			want: NewGCS(config.Options{}),
+			want: storageprovider.NewGCS(storageprovider.GCSConfig{}),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewProvider(tt.args.storage, tt.args.options); !reflect.DeepEqual(got, tt.want) {
+			if got := storageprovider.NewProvider(tt.args.storage, tt.args.options); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewProvider() = %v, want %v", got, tt.want)
 			}
 		})

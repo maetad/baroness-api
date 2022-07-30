@@ -15,14 +15,13 @@ import (
 	"time"
 
 	"cloud.google.com/go/storage"
-	"github.com/pakkaparn/no-idea-api/internal/config"
 	"github.com/pakkaparn/no-idea-api/internal/services/fileservice/storageprovider"
 	"google.golang.org/api/option"
 )
 
 func TestNewGCS(t *testing.T) {
 	type args struct {
-		options config.Options
+		config storageprovider.GCSConfig
 	}
 	tests := []struct {
 		name string
@@ -32,26 +31,28 @@ func TestNewGCS(t *testing.T) {
 		{
 			name: "NewGCS",
 			args: args{
-				options: config.Options{
-					GCSProjectID: "project-id",
-					GCSBucket:    "bucket",
-					AppName:      "app-name",
+				config: storageprovider.GCSConfig{
+					ProjectID:  "project-id",
+					BucketName: "bucket",
+					UploadPath: "app-name",
 				},
 			},
 			want: func() storageprovider.StorageProvider {
 				client, _ := storage.NewClient(context.Background())
 				return &storageprovider.GCSProvider{
-					Client:     client,
-					ProjectID:  "project-id",
-					BucketName: "bucket",
-					UploadPath: "app-name",
+					Client: client,
+					GCSConfig: storageprovider.GCSConfig{
+						ProjectID:  "project-id",
+						BucketName: "bucket",
+						UploadPath: "app-name",
+					},
 				}
 			}(),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := storageprovider.NewGCS(tt.args.options); !reflect.DeepEqual(got, tt.want) {
+			if got := storageprovider.NewGCS(tt.args.config); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewGCS() = %v, want %v", got, tt.want)
 			}
 		})
@@ -60,8 +61,8 @@ func TestNewGCS(t *testing.T) {
 
 func TestNewGCSWithClient(t *testing.T) {
 	type args struct {
-		client  *storage.Client
-		options config.Options
+		client *storage.Client
+		config storageprovider.GCSConfig
 	}
 	tests := []struct {
 		name string
@@ -74,27 +75,29 @@ func TestNewGCSWithClient(t *testing.T) {
 				client, _ := storage.NewClient(context.Background())
 				return args{
 					client: client,
-					options: config.Options{
-						GCSProjectID: "project-id",
-						GCSBucket:    "bucket",
-						AppName:      "app-name",
+					config: storageprovider.GCSConfig{
+						ProjectID:  "project-id",
+						BucketName: "bucket",
+						UploadPath: "app-name",
 					},
 				}
 			}(),
 			want: func() storageprovider.StorageProvider {
 				client, _ := storage.NewClient(context.Background())
 				return &storageprovider.GCSProvider{
-					Client:     client,
-					ProjectID:  "project-id",
-					BucketName: "bucket",
-					UploadPath: "app-name",
+					Client: client,
+					GCSConfig: storageprovider.GCSConfig{
+						ProjectID:  "project-id",
+						BucketName: "bucket",
+						UploadPath: "app-name",
+					},
 				}
 			}(),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := storageprovider.NewGCSWithClient(tt.args.client, tt.args.options); !reflect.DeepEqual(got, tt.want) {
+			if got := storageprovider.NewGCSWithClient(tt.args.client, tt.args.config); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewGCSWithClient() = %v, want %v", got, tt.want)
 			}
 		})
@@ -103,8 +106,8 @@ func TestNewGCSWithClient(t *testing.T) {
 
 func TestGCSProvider_Upload(t *testing.T) {
 	type fields struct {
-		Client  *storage.Client
-		options config.Options
+		Client *storage.Client
+		config storageprovider.GCSConfig
 	}
 	type args struct {
 		file     []byte
@@ -132,10 +135,10 @@ func TestGCSProvider_Upload(t *testing.T) {
 				)
 				return fields{
 					Client: client,
-					options: config.Options{
-						GCSProjectID: "project-id",
-						GCSBucket:    "bucket",
-						AppName:      "app-name",
+					config: storageprovider.GCSConfig{
+						ProjectID:  "project-id",
+						BucketName: "bucket",
+						UploadPath: "app-name",
 					},
 				}
 			}(),
@@ -160,10 +163,10 @@ func TestGCSProvider_Upload(t *testing.T) {
 				)
 				return fields{
 					Client: client,
-					options: config.Options{
-						GCSProjectID: "project-id",
-						GCSBucket:    "bucket",
-						AppName:      "app-name",
+					config: storageprovider.GCSConfig{
+						ProjectID:  "project-id",
+						BucketName: "bucket",
+						UploadPath: "app-name",
 					},
 				}
 			}(),
@@ -176,7 +179,7 @@ func TestGCSProvider_Upload(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p := storageprovider.NewGCSWithClient(tt.fields.Client, tt.fields.options)
+			p := storageprovider.NewGCSWithClient(tt.fields.Client, tt.fields.config)
 
 			got, err := p.Upload(tt.args.file, tt.args.filename)
 			if (err != nil) != tt.wantErr {
@@ -192,8 +195,8 @@ func TestGCSProvider_Upload(t *testing.T) {
 
 func TestGCSProvider_GetSigedURL(t *testing.T) {
 	type fields struct {
-		Client  *storage.Client
-		options config.Options
+		Client *storage.Client
+		config storageprovider.GCSConfig
 	}
 	type args struct {
 		filename string
@@ -222,12 +225,12 @@ func TestGCSProvider_GetSigedURL(t *testing.T) {
 
 				return fields{
 					Client: client,
-					options: config.Options{
-						GCSProjectID:     "project-id",
-						GCSBucket:        "bucket",
-						AppName:          "app-name",
-						GoogleAccessID:   "access-id",
-						GooglePrivateKey: generatePrivateKey(),
+					config: storageprovider.GCSConfig{
+						ProjectID:      "project-id",
+						BucketName:     "bucket",
+						UploadPath:     "app-name",
+						GoogleAccessID: "access-id",
+						PrivateKey:     generatePrivateKey(),
 					},
 				}
 			}(),
@@ -242,7 +245,7 @@ func TestGCSProvider_GetSigedURL(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p := storageprovider.NewGCSWithClient(tt.fields.Client, tt.fields.options)
+			p := storageprovider.NewGCSWithClient(tt.fields.Client, tt.fields.config)
 			got, err := p.GetSigedURL(tt.args.filename, tt.args.expired)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GCSProvider.GetSigedURL() error = %v, wantErr %v", err, tt.wantErr)

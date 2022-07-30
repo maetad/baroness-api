@@ -8,22 +8,19 @@ import (
 )
 
 type Options struct {
-	AppName           string
-	ListenAddressHTTP string
-	DatabaseHost      string
-	DatabaseUser      string
-	DatabasePass      string
-	DatabaseName      string
-	DatabasePort      int
-	DatabaseSSLMode   string
-	DatabaseTimezone  string
-	JWTSigningMethod  jwt.SigningMethod
-	JWTSigningKey     []byte
-	JWTAllowMethod    authservice.AllowSigningMethod
-	JWTExpiredIn      time.Duration
-	GCSProjectID      string
-	GCSBucket         string
-	GoogleAccessID    string
-	GoogleCredential  string
-	GooglePrivateKey  []byte
+	AppName            string
+	ListenAddressHTTP  string
+	DatabaseHost       string
+	DatabaseUser       string
+	DatabasePass       string
+	DatabaseName       string
+	DatabasePort       int
+	DatabaseSSLMode    string
+	DatabaseTimezone   string
+	JWTSigningMethod   jwt.SigningMethod
+	JWTSigningKey      []byte
+	JWTAllowMethod     authservice.AllowSigningMethod
+	JWTExpiredIn       time.Duration
+	FileUploadProvider string
+	FileUploadConfig   map[string]interface{}
 }
