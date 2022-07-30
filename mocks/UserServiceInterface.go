@@ -35,6 +35,29 @@ func (_m *UserServiceInterface) Create(r userservice.UserCreateRequest) (*userse
 	return r0, r1
 }
 
+// GetByUsername provides a mock function with given fields: username
+func (_m *UserServiceInterface) GetByUsername(username string) (*userservice.User, error) {
+	ret := _m.Called(username)
+
+	var r0 *userservice.User
+	if rf, ok := ret.Get(0).(func(string) *userservice.User); ok {
+		r0 = rf(username)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*userservice.User)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(username)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type mockConstructorTestingTNewUserServiceInterface interface {
 	mock.TestingT
 	Cleanup(func())

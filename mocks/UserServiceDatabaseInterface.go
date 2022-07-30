@@ -28,6 +28,22 @@ func (_m *UserServiceDatabaseInterface) Create(value interface{}) *gorm.DB {
 	return r0
 }
 
+// First provides a mock function with given fields: value
+func (_m *UserServiceDatabaseInterface) First(value interface{}) *gorm.DB {
+	ret := _m.Called(value)
+
+	var r0 *gorm.DB
+	if rf, ok := ret.Get(0).(func(interface{}) *gorm.DB); ok {
+		r0 = rf(value)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*gorm.DB)
+		}
+	}
+
+	return r0
+}
+
 type mockConstructorTestingTNewUserServiceDatabaseInterface interface {
 	mock.TestingT
 	Cleanup(func())
