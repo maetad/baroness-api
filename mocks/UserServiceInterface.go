@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	userservice "github.com/pakkaparn/no-idea-api/internal/userservice"
+	userservice "github.com/pakkaparn/no-idea-api/internal/services/userservice"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -13,21 +13,44 @@ type UserServiceInterface struct {
 }
 
 // Create provides a mock function with given fields: r
-func (_m *UserServiceInterface) Create(r userservice.UserCreateRequest) (*userservice.User, error) {
+func (_m *UserServiceInterface) Create(r userservice.UserCreateRequest) (userservice.UserInterface, error) {
 	ret := _m.Called(r)
 
-	var r0 *userservice.User
-	if rf, ok := ret.Get(0).(func(userservice.UserCreateRequest) *userservice.User); ok {
+	var r0 userservice.UserInterface
+	if rf, ok := ret.Get(0).(func(userservice.UserCreateRequest) userservice.UserInterface); ok {
 		r0 = rf(r)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*userservice.User)
+			r0 = ret.Get(0).(userservice.UserInterface)
 		}
 	}
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(userservice.UserCreateRequest) error); ok {
 		r1 = rf(r)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetByUsername provides a mock function with given fields: username
+func (_m *UserServiceInterface) GetByUsername(username string) (userservice.UserInterface, error) {
+	ret := _m.Called(username)
+
+	var r0 userservice.UserInterface
+	if rf, ok := ret.Get(0).(func(string) userservice.UserInterface); ok {
+		r0 = rf(username)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(userservice.UserInterface)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(username)
 	} else {
 		r1 = ret.Error(1)
 	}

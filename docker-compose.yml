@@ -18,6 +18,9 @@ services:
       - DATABASE_NAME=noidea
       - DATABASE_PORT=5432
       - DATABASE_TIMEZONE=Asia/Bangkok
+      - JWT_SIGNING_METHOD=HS256
+      - JWT_SIGNING_KEY=mykey
+      - JWT_ALLOW_METHOD=HMAC
     depends_on:
       - db
 
