@@ -62,7 +62,7 @@ func registerRouter(
 		}
 
 		stateHandler := handlers.NewStateHandler(l, services.stateservice)
-		stateRoute := authorized.Group("/events/:event_id/workflows/:workflow_id")
+		stateRoute := authorized.Group("/events/:event_id/workflows/:workflow_id/states")
 		stateRoute.Use(workflowHandler.Get)
 		{
 			stateRoute.GET("/", stateHandler.List)
