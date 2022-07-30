@@ -107,6 +107,14 @@ func TestUserHandler_List(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			h := handlers.NewUserHandler(tt.fields.log, tt.fields.userservice)
 			h.List(tt.args.c)
+
+			if tt.args.c.Writer.Status() != tt.want {
+				t.Errorf("List() = %v, want %v", tt.args.c.Writer.Status(), tt.want)
+			}
+		})
+	}
+}
+
 		})
 	}
 }
