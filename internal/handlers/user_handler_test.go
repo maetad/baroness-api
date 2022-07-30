@@ -1,6 +1,7 @@
 package handlers_test
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"net/http/httptest"
@@ -60,7 +61,7 @@ func TestUserHandler_List(t *testing.T) {
 				userservice.On("List").
 					Return(users, nil)
 				return fields{
-					log:         &logrus.Entry{},
+					log:         logrus.WithContext(context.TODO()),
 					userservice: userservice,
 				}
 			}(),
@@ -84,7 +85,7 @@ func TestUserHandler_List(t *testing.T) {
 				userservice.On("List").
 					Return(nil, errors.New("list fail"))
 				return fields{
-					log:         &logrus.Entry{},
+					log:         logrus.WithContext(context.TODO()),
 					userservice: userservice,
 				}
 			}(),

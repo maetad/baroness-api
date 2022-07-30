@@ -1,6 +1,7 @@
 package handlers_test
 
 import (
+	"context"
 	"errors"
 	"io"
 	"net/http"
@@ -89,7 +90,7 @@ func TestAuthHandler_Login(t *testing.T) {
 					Return(nil, errors.New("user not found"))
 
 				f := fields{
-					log:         &logrus.Entry{},
+					log:         logrus.WithContext(context.TODO()),
 					userservice: userservice,
 				}
 
@@ -121,7 +122,7 @@ func TestAuthHandler_Login(t *testing.T) {
 					Return(user, nil)
 
 				f := fields{
-					log:         &logrus.Entry{},
+					log:         logrus.WithContext(context.TODO()),
 					userservice: userservice,
 				}
 
@@ -159,7 +160,7 @@ func TestAuthHandler_Login(t *testing.T) {
 					Return("", errors.New("generate token fail"))
 
 				f := fields{
-					log:         &logrus.Entry{},
+					log:         logrus.WithContext(context.TODO()),
 					userservice: userservice,
 					authservice: authservice,
 				}
@@ -262,7 +263,7 @@ func TestAuthHandler_Authorize(t *testing.T) {
 					Return(nil, errors.New("cannot parse"))
 
 				f := fields{
-					log:         &logrus.Entry{},
+					log:         logrus.WithContext(context.TODO()),
 					authservice: authservice,
 				}
 
@@ -292,7 +293,7 @@ func TestAuthHandler_Authorize(t *testing.T) {
 					Return(jwt.MapClaims{}, nil)
 
 				f := fields{
-					log:         &logrus.Entry{},
+					log:         logrus.WithContext(context.TODO()),
 					authservice: authservice,
 				}
 
