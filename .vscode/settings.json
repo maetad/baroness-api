@@ -3,6 +3,7 @@
         "structure",
         "user",
         "auth",
-        "file"
+        "file",
+        "event"
     ]
 }
