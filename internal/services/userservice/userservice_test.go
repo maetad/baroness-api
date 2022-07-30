@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/pakkaparn/no-idea-api/internal/userservice"
+	"github.com/pakkaparn/no-idea-api/internal/services/userservice"
 	"github.com/pakkaparn/no-idea-api/mocks"
 	"github.com/stretchr/testify/mock"
 	"gorm.io/gorm"
@@ -79,7 +79,7 @@ func TestUserService_Create(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			db.ExpectedCalls = nil
+			db.Mock.ExpectedCalls = nil
 			db.On("Create", mock.AnythingOfType("*userservice.User")).
 				Return(&gorm.DB{
 					Error: func() error {
@@ -115,3 +115,4 @@ func TestUserService_Create(t *testing.T) {
 		})
 	}
 }
+

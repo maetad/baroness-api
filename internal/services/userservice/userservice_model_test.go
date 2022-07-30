@@ -3,7 +3,7 @@ package userservice_test
 import (
 	"testing"
 
-	"github.com/pakkaparn/no-idea-api/internal/userservice"
+	"github.com/pakkaparn/no-idea-api/internal/services/userservice"
 )
 
 func TestUser_SetPassword(t *testing.T) {

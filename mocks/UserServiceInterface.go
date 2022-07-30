@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	userservice "github.com/pakkaparn/no-idea-api/internal/userservice"
+	userservice "github.com/pakkaparn/no-idea-api/internal/services/userservice"
 	mock "github.com/stretchr/testify/mock"
 )
 

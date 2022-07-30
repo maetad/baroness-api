@@ -32,3 +32,4 @@ func (u UserService) Create(r UserCreateRequest) (*User, error) {
 
 	return user, nil
 }
+
