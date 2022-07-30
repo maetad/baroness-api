@@ -1,13 +1,14 @@
-package userservice
+package userservice_test
 
 import (
 	"testing"
+
+	"github.com/pakkaparn/no-idea-api/internal/userservice"
 )
 
 func TestUser_SetPassword(t *testing.T) {
 	type fields struct {
 		Username    string
-		password    string
 		DisplayName string
 	}
 	type args struct {
@@ -28,9 +29,8 @@ func TestUser_SetPassword(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			u := &User{
+			u := &userservice.User{
 				Username:    tt.fields.Username,
-				password:    tt.fields.password,
 				DisplayName: tt.fields.DisplayName,
 			}
 			u.SetPassword(tt.args.password)
@@ -41,7 +41,7 @@ func TestUser_SetPassword(t *testing.T) {
 func TestUser_ValidatePassword(t *testing.T) {
 	type fields struct {
 		Username    string
-		password    string
+		Password    string
 		DisplayName string
 	}
 	type args struct {
@@ -56,7 +56,7 @@ func TestUser_ValidatePassword(t *testing.T) {
 		{
 			name: "password correct",
 			fields: fields{
-				password: "$2a$10$B2r2aAadfOjIFCyOg9HLS.TyE6RYWViuZj78p6zRvfJcIGjmWPA/m",
+				Password: "$2a$10$B2r2aAadfOjIFCyOg9HLS.TyE6RYWViuZj78p6zRvfJcIGjmWPA/m",
 			},
 			args: args{
 				password: "password",
@@ -66,7 +66,7 @@ func TestUser_ValidatePassword(t *testing.T) {
 		{
 			name: "password incorrect",
 			fields: fields{
-				password: "$2a$10$B2r2aAadfOjIFCyOg9HLS.TyE6RYWViuZj78p6zRvfJcIGjmWPA/m",
+				Password: "$2a$10$B2r2aAadfOjIFCyOg9HLS.TyE6RYWViuZj78p6zRvfJcIGjmWPA/m",
 			},
 			args: args{
 				password: "Password",
@@ -76,9 +76,9 @@ func TestUser_ValidatePassword(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			u := &User{
+			u := &userservice.User{
 				Username:    tt.fields.Username,
-				password:    tt.fields.password,
+				Password:    tt.fields.Password,
 				DisplayName: tt.fields.DisplayName,
 			}
 			if err := u.ValidatePassword(tt.args.password); (err != nil) != tt.wantErr {

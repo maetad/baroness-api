@@ -2,16 +2,20 @@ package userservice
 
 import "gorm.io/gorm"
 
+type UserServiceDatabaseInterface interface {
+	Create(value interface{}) (tx *gorm.DB)
+}
+
 type UserService struct {
-	db *gorm.DB
+	db UserServiceDatabaseInterface
 }
 
 type UserServiceInterface interface {
 	Create(r UserCreateRequest) (*User, error)
 }
 
-func New() UserService {
-	return UserService{}
+func New(db UserServiceDatabaseInterface) UserService {
+	return UserService{db}
 }
 
 func (u UserService) Create(r UserCreateRequest) (*User, error) {
