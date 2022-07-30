@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pakkaparn/no-idea-api/internal/config"
@@ -62,4 +63,16 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"token": token})
+}
+
+func (h *AuthHandler) Authorize(c *gin.Context) {
+	s := c.Request.Header.Get("Authorization")
+	token := strings.TrimPrefix(s, "Bearer ")
+	if _, err := h.authservice.ParseToken(token); err != nil {
+		h.log.WithError(err).Errorf("Authorize(): h.authservice.ParseToken error %v", err)
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	c.Next()
 }

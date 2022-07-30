@@ -19,13 +19,14 @@ func registerRouter(
 		c.String(http.StatusOK, "OK")
 	})
 
+	authHandler := handlers.NewAuthHandler(l, o, services.authservice, services.userservice)
+
 	authRoute := r.Group("/auth")
 	{
-		authHandler := handlers.NewAuthHandler(l, o, services.authservice, services.userservice)
 		authRoute.POST("/login", authHandler.Login)
 	}
 
-	userRoute := r.Group("/users")
+	userRoute := r.Group("/users").Use(authHandler.Authorize)
 	{
 		userHandler := handlers.NewUserHandler(l, services.userservice)
 		userRoute.GET("/", userHandler.List)
