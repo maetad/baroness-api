@@ -277,7 +277,7 @@ func TestEventHandler_Get(t *testing.T) {
 
 				c.Params = gin.Params{
 					{
-						Key:   "id",
+						Key:   "event_id",
 						Value: "1",
 					},
 				}
@@ -308,7 +308,7 @@ func TestEventHandler_Get(t *testing.T) {
 
 				c.Params = gin.Params{
 					{
-						Key:   "id",
+						Key:   "event_id",
 						Value: "1",
 					},
 				}
@@ -330,7 +330,7 @@ func TestEventHandler_Get(t *testing.T) {
 
 				c.Params = gin.Params{
 					{
-						Key:   "id",
+						Key:   "event_id",
 						Value: "one",
 					},
 				}
@@ -375,8 +375,6 @@ func TestEventHandler_Update(t *testing.T) {
 				event := &model.Event{}
 				u := &mocks.EventServiceInterface{}
 
-				u.On("Get", uint(1)).Return(event, nil)
-
 				u.On(
 					"Update",
 					event,
@@ -407,50 +405,12 @@ func TestEventHandler_Update(t *testing.T) {
 					Body:   io.NopCloser(strings.NewReader(`{"name":"new event name","platform":["platform 1","platform 2"],"channel":["channel 1", "channel 2"]}`)),
 				}
 
-				c.Params = gin.Params{
-					{
-						Key:   "id",
-						Value: "1",
-					},
-				}
-
+				c.Set("event", &model.Event{})
 				c.Set("user", &model.User{})
 
 				return args{c}
 			}(),
 			want: http.StatusOK,
-		},
-		{
-			name: "event not found",
-			fields: func() fields {
-				u := &mocks.EventServiceInterface{}
-				u.On("Get", uint(1)).Return(nil, errors.New("event not found"))
-
-				return fields{
-					log:          logrus.WithContext(context.TODO()),
-					eventservice: u,
-				}
-			}(),
-			args: func() args {
-				w := httptest.NewRecorder()
-				c, _ := gin.CreateTestContext(w)
-
-				c.Request = &http.Request{
-					URL:    &url.URL{},
-					Header: make(http.Header),
-					Body:   io.NopCloser(strings.NewReader(`{"name":"new event name","platform":["platform 1","platform 2"],"channel":["channel 1", "channel 2"]}`)),
-				}
-
-				c.Params = gin.Params{
-					{
-						Key:   "id",
-						Value: "1",
-					},
-				}
-
-				return args{c}
-			}(),
-			want: http.StatusNotFound,
 		},
 		{
 			name: "body invalid",
@@ -464,12 +424,8 @@ func TestEventHandler_Update(t *testing.T) {
 					Body:   io.NopCloser(strings.NewReader(`{"name":"new event name","platform":"platform 1","channel":["channel 1", "channel 2"]}`)),
 				}
 
-				c.Params = gin.Params{
-					{
-						Key:   "id",
-						Value: "1",
-					},
-				}
+				c.Set("event", &model.Event{})
+				c.Set("user", &model.User{})
 
 				return args{c}
 			}(),
@@ -480,8 +436,6 @@ func TestEventHandler_Update(t *testing.T) {
 			fields: func() fields {
 				event := &model.Event{}
 				u := &mocks.EventServiceInterface{}
-
-				u.On("Get", uint(1)).Return(event, nil)
 
 				u.On(
 					"Update",
@@ -509,41 +463,12 @@ func TestEventHandler_Update(t *testing.T) {
 					Body:   io.NopCloser(strings.NewReader(`{"name":"new event name","platform":["platform 1","platform 2"],"channel":["channel 1", "channel 2"]}`)),
 				}
 
-				c.Params = gin.Params{
-					{
-						Key:   "id",
-						Value: "1",
-					},
-				}
-
+				c.Set("event", &model.Event{})
 				c.Set("user", &model.User{})
 
 				return args{c}
 			}(),
 			want: http.StatusInternalServerError,
-		},
-		{
-			name: "event id invalid",
-			args: func() args {
-				w := httptest.NewRecorder()
-				c, _ := gin.CreateTestContext(w)
-
-				c.Request = &http.Request{
-					URL:    &url.URL{},
-					Header: make(http.Header),
-					Body:   io.NopCloser(strings.NewReader(`{"name":"new event name","platform":["platform 1","platform 2"],"channel":["channel 1", "channel 2"]}`)),
-				}
-
-				c.Params = gin.Params{
-					{
-						Key:   "id",
-						Value: "one",
-					},
-				}
-
-				return args{c}
-			}(),
-			want: http.StatusNotFound,
 		},
 	}
 	for _, tt := range tests {
@@ -581,7 +506,6 @@ func TestEventHandler_Delete(t *testing.T) {
 				event := &model.Event{}
 				u := &mocks.EventServiceInterface{}
 
-				u.On("Get", uint(1)).Return(event, nil)
 				u.On("Delete", event, mock.Anything).Return(nil)
 
 				return fields{
@@ -598,13 +522,7 @@ func TestEventHandler_Delete(t *testing.T) {
 					Header: make(http.Header),
 				}
 
-				c.Params = gin.Params{
-					{
-						Key:   "id",
-						Value: "1",
-					},
-				}
-
+				c.Set("event", &model.Event{})
 				c.Set("user", &model.User{})
 
 				return args{c}
@@ -612,69 +530,11 @@ func TestEventHandler_Delete(t *testing.T) {
 			want: http.StatusNoContent,
 		},
 		{
-			name: "event not found",
-			fields: func() fields {
-				u := &mocks.EventServiceInterface{}
-				u.On("Get", uint(1)).Return(nil, errors.New("event not found"))
-
-				return fields{
-					log:          logrus.WithContext(context.TODO()),
-					eventservice: u,
-				}
-			}(),
-			args: func() args {
-				w := httptest.NewRecorder()
-				c, _ := gin.CreateTestContext(w)
-
-				c.Request = &http.Request{
-					URL:    &url.URL{},
-					Header: make(http.Header),
-				}
-
-				c.Params = gin.Params{
-					{
-						Key:   "id",
-						Value: "1",
-					},
-				}
-
-				c.Set("user", &model.User{})
-
-				return args{c}
-			}(),
-			want: http.StatusNotFound,
-		},
-		{
-			name: "event id invalid",
-			args: func() args {
-				w := httptest.NewRecorder()
-				c, _ := gin.CreateTestContext(w)
-
-				c.Request = &http.Request{
-					URL:    &url.URL{},
-					Header: make(http.Header),
-				}
-
-				c.Params = gin.Params{
-					{
-						Key:   "id",
-						Value: "one",
-					},
-				}
-
-				c.Set("user", &model.User{})
-
-				return args{c}
-			}(),
-			want: http.StatusNotFound,
-		},
-		{
 			name: "event delete fail",
 			fields: func() fields {
 				event := &model.Event{}
 				u := &mocks.EventServiceInterface{}
 
-				u.On("Get", uint(1)).Return(event, nil)
 				u.On("Delete", event, mock.Anything).Return(errors.New("delete fail"))
 
 				return fields{
@@ -691,13 +551,7 @@ func TestEventHandler_Delete(t *testing.T) {
 					Header: make(http.Header),
 				}
 
-				c.Params = gin.Params{
-					{
-						Key:   "id",
-						Value: "1",
-					},
-				}
-
+				c.Set("event", &model.Event{})
 				c.Set("user", &model.User{})
 
 				return args{c}
@@ -715,6 +569,51 @@ func TestEventHandler_Delete(t *testing.T) {
 
 			if tt.args.c.Writer.Status() != tt.want {
 				t.Errorf("Delete() = %v, want %v", tt.args.c.Writer.Status(), tt.want)
+			}
+		})
+	}
+}
+
+func TestEventHandler_Show(t *testing.T) {
+	type fields struct {
+		log          *logrus.Entry
+		eventservice eventservice.EventServiceInterface
+	}
+	type args struct {
+		c *gin.Context
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   int
+	}{
+
+		{
+			name: "event show success",
+			args: func() args {
+				w := httptest.NewRecorder()
+				c, _ := gin.CreateTestContext(w)
+
+				c.Request = &http.Request{
+					URL:    &url.URL{},
+					Header: make(http.Header),
+				}
+
+				c.Set("event", &model.Event{})
+
+				return args{c}
+			}(),
+			want: http.StatusOK,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			h := handlers.NewEventHandler(tt.fields.log, tt.fields.eventservice)
+			h.Show(tt.args.c)
+
+			if tt.args.c.Writer.Status() != tt.want {
+				t.Errorf("Show() = %v, want %v", tt.args.c.Writer.Status(), tt.want)
 			}
 		})
 	}

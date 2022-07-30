@@ -19,6 +19,28 @@ func NewEventHandler(log *logrus.Entry, eventservice eventservice.EventServiceIn
 	return &EventHandler{log, eventservice}
 }
 
+func (h *EventHandler) Get(c *gin.Context) {
+	var (
+		id  int
+		err error
+	)
+
+	if id, err = strconv.Atoi(c.Param("event_id")); err != nil {
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
+
+	event, err := h.eventservice.Get(uint(id))
+	if err != nil {
+		h.log.WithError(err).Errorf("Get(): h.eventservice.Get error %v", err)
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
+
+	c.Set("event", event)
+	c.Next()
+}
+
 func (h *EventHandler) List(c *gin.Context) {
 	list, err := h.eventservice.List()
 	if err != nil {
@@ -46,51 +68,22 @@ func (h *EventHandler) Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, event)
 }
 
-func (h *EventHandler) Get(c *gin.Context) {
-	var (
-		id  int
-		err error
-	)
-
-	if id, err = strconv.Atoi(c.Param("id")); err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
-		return
-	}
-
-	event, err := h.eventservice.Get(uint(id))
-	if err != nil {
-		h.log.WithError(err).Errorf("Get(): h.eventservice.Get error %v", err)
-		c.AbortWithStatus(http.StatusNotFound)
-		return
-	}
+func (h *EventHandler) Show(c *gin.Context) {
+	event := c.MustGet("event").(*model.Event)
 
 	c.JSON(http.StatusOK, event)
 }
 
 func (h *EventHandler) Update(c *gin.Context) {
-	var (
-		id  int
-		err error
-	)
-
-	if id, err = strconv.Atoi(c.Param("id")); err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
-		return
-	}
 	var r eventservice.EventUpdateRequest
 	if err := c.ShouldBindJSON(&r); err != nil {
 		c.AbortWithStatus(http.StatusUnprocessableEntity)
 		return
 	}
 
-	event, err := h.eventservice.Get(uint(id))
-	if err != nil {
-		h.log.WithError(err).Errorf("Update(): h.eventservice.Get error %v", err)
-		c.AbortWithStatus(http.StatusNotFound)
-		return
-	}
+	event := c.MustGet("event").(*model.Event)
 
-	event, err = h.eventservice.Update(event, r, c.MustGet("user").(*model.User))
+	event, err := h.eventservice.Update(event, r, c.MustGet("user").(*model.User))
 	if err != nil {
 		h.log.WithError(err).Errorf("Update(): h.eventservice.Update error %v", err)
 		c.AbortWithStatus(http.StatusInternalServerError)
@@ -101,24 +94,9 @@ func (h *EventHandler) Update(c *gin.Context) {
 }
 
 func (h *EventHandler) Delete(c *gin.Context) {
-	var (
-		id    int
-		err   error
-		event *model.Event
-	)
+	event := c.MustGet("event").(*model.Event)
 
-	if id, err = strconv.Atoi(c.Param("id")); err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
-		return
-	}
-
-	if event, err = h.eventservice.Get(uint(id)); err != nil {
-		h.log.WithError(err).Errorf("Delete(): h.eventservice.Get error %v", err)
-		c.AbortWithStatus(http.StatusNotFound)
-		return
-	}
-
-	if err = h.eventservice.Delete(event, c.MustGet("user").(*model.User)); err != nil {
+	if err := h.eventservice.Delete(event, c.MustGet("user").(*model.User)); err != nil {
 		h.log.WithError(err).Errorf("Delete(): h.eventservice.Delete error %v", err)
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
