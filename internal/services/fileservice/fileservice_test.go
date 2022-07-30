@@ -4,9 +4,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/pakkaparn/no-idea-api/internal/services/fileservice"
-	"github.com/pakkaparn/no-idea-api/internal/services/fileservice/storageprovider"
-	"github.com/pakkaparn/no-idea-api/mocks"
+	"github.com/maetad/baroness-api/internal/services/fileservice"
+	"github.com/maetad/baroness-api/internal/services/fileservice/storageprovider"
+	"github.com/maetad/baroness-api/mocks"
 )
 
 func TestFileService_Upload(t *testing.T) {

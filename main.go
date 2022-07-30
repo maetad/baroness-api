@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"os/signal"
@@ -15,7 +16,9 @@ import (
 	"github.com/maetad/baroness-api/internal"
 	"github.com/maetad/baroness-api/internal/config"
 	"github.com/maetad/baroness-api/internal/services/authservice"
+	"github.com/maetad/baroness-api/internal/services/fileservice/storageprovider"
 	"github.com/sirupsen/logrus"
+	"golang.org/x/oauth2/google"
 )
 
 var log *logrus.Entry
@@ -117,6 +120,33 @@ func init() {
 
 			return time.Duration(t * int(time.Second))
 		}(),
+	}
+
+	switch os.Getenv("FILE_UPLOAD_PROVIDER") {
+	case "GCS":
+		options.StorageProvider = storageprovider.GCS
+		options.StorageConfig = map[string]interface{}{
+			"google_credential": os.Getenv("GOOGLE_CREDENTIAL"),
+			"google_access_id":  os.Getenv("GOOGLE_ACCESS_ID"),
+			"project_id":        os.Getenv("GCS_PROJECT_ID"),
+			"bucket_name":       os.Getenv("GCS_BUCKET_NAME"),
+			"upload_path":       os.Getenv("GCS_UPLOAD_PATH"),
+		}
+
+		if f, err := ioutil.ReadFile(os.Getenv("GCS_SERVICE_ACCOUNT")); err != nil {
+			if j, err := google.JWTConfigFromJSON(f); err != nil {
+				options.StorageConfig["private_key"] = j.PrivateKey
+			}
+		}
+	case "AWSS3":
+		options.StorageProvider = storageprovider.AWSS3
+		options.StorageConfig = map[string]interface{}{
+			"region":            os.Getenv("AWS_S3_REGION"),
+			"access_key_id":     os.Getenv("AWS_S3_ACCESS_KEY_ID"),
+			"secret_access_key": os.Getenv("AWS_S3_SECRET_ACCESS_KEY"),
+			"bucket_name":       os.Getenv("AWS_S3_BUCKET_NAME"),
+			"app_name":          os.Getenv("AWS_S3_APP_NAME"),
+		}
 	}
 
 	log = logrus.WithField("app_name", options.AppName)

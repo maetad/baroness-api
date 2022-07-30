@@ -15,7 +15,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/storage"
-	"github.com/pakkaparn/no-idea-api/internal/services/fileservice/storageprovider"
+	"github.com/maetad/baroness-api/internal/services/fileservice/storageprovider"
 	"google.golang.org/api/option"
 )
 

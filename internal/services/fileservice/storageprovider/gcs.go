@@ -23,11 +23,6 @@ type GCSConfig struct {
 
 type GCSProvider struct {
 	Client *storage.Client
-	// ProjectID      string
-	// BucketName     string
-	// UploadPath     string
-	// googleAccessID string
-	// privateKey     []byte
 	GCSConfig
 }
 

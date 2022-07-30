@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/pakkaparn/no-idea-api/internal/services/fileservice/storageprovider"
+	"github.com/maetad/baroness-api/internal/services/fileservice/storageprovider"
 )
 
 func TestNewAWSS3(t *testing.T) {

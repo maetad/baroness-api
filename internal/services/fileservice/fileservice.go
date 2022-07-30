@@ -1,7 +1,7 @@
 package fileservice
 
 import (
-	"github.com/pakkaparn/no-idea-api/internal/services/fileservice/storageprovider"
+	"github.com/maetad/baroness-api/internal/services/fileservice/storageprovider"
 )
 
 type FileServiceInterface interface {

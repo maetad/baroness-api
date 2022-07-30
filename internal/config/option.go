@@ -5,22 +5,23 @@ import (
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/maetad/baroness-api/internal/services/authservice"
+	"github.com/maetad/baroness-api/internal/services/fileservice/storageprovider"
 )
 
 type Options struct {
-	AppName            string
-	ListenAddressHTTP  string
-	DatabaseHost       string
-	DatabaseUser       string
-	DatabasePass       string
-	DatabaseName       string
-	DatabasePort       int
-	DatabaseSSLMode    string
-	DatabaseTimezone   string
-	JWTSigningMethod   jwt.SigningMethod
-	JWTSigningKey      []byte
-	JWTAllowMethod     authservice.AllowSigningMethod
-	JWTExpiredIn       time.Duration
-	FileUploadProvider string
-	FileUploadConfig   map[string]interface{}
+	AppName           string
+	ListenAddressHTTP string
+	DatabaseHost      string
+	DatabaseUser      string
+	DatabasePass      string
+	DatabaseName      string
+	DatabasePort      int
+	DatabaseSSLMode   string
+	DatabaseTimezone  string
+	JWTSigningMethod  jwt.SigningMethod
+	JWTSigningKey     []byte
+	JWTAllowMethod    authservice.AllowSigningMethod
+	JWTExpiredIn      time.Duration
+	StorageProvider   storageprovider.Provider
+	StorageConfig     map[string]interface{}
 }

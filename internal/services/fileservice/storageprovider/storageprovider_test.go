@@ -4,14 +4,13 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/pakkaparn/no-idea-api/internal/config"
-	"github.com/pakkaparn/no-idea-api/internal/services/fileservice/storageprovider"
+	"github.com/maetad/baroness-api/internal/services/fileservice/storageprovider"
 )
 
 func TestNewProvider(t *testing.T) {
 	type args struct {
 		storage storageprovider.Provider
-		options config.Options
+		options map[string]interface{}
 	}
 	tests := []struct {
 		name string
@@ -22,8 +21,23 @@ func TestNewProvider(t *testing.T) {
 			name: "GCS",
 			args: args{
 				storage: storageprovider.GCS,
+				options: map[string]interface{}{
+					"google_credential": "google-credential",
+					"google_access_id":  "google-access-id",
+					"project_id":        "project-id",
+					"bucket_name":       "bucket-name",
+					"upload_path":       "upload-path",
+					"private_key":       []byte("private-key"),
+				},
 			},
-			want: storageprovider.NewGCS(storageprovider.GCSConfig{}),
+			want: storageprovider.NewGCS(storageprovider.GCSConfig{
+				GoogleCredential: "google-credential",
+				GoogleAccessID:   "google-access-id",
+				ProjectID:        "project-id",
+				BucketName:       "bucket-name",
+				UploadPath:       "upload-path",
+				PrivateKey:       []byte("private-key"),
+			}),
 		},
 	}
 	for _, tt := range tests {
