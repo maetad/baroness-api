@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS "public"."workflows" (
   "id" serial NOT NULL,
   PRIMARY KEY ("id"),
-  "event_id" integer NOT NULL REFERENCES "public"."users"("id"),
+  "event_id" integer NOT NULL REFERENCES "public"."events"("id"),
   "name" text NOT NULL,
   "created_by" integer NOT NULL REFERENCES "public"."users"("id")
   "updated_by" integer NOT NULL REFERENCES "public"."users"("id")
