@@ -1,7 +1,7 @@
 package userservice
 
 type UserCreateRequest struct {
-	Username    string
-	Password    string
-	DisplayName string
+	Username    string `json:"username" binding:"required"`
+	Password    string `json:"password" binding:"required"`
+	DisplayName string `json:"display_name" binding:"required"`
 }

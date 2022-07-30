@@ -3,10 +3,12 @@ package handlers_test
 import (
 	"context"
 	"errors"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -17,6 +19,8 @@ import (
 )
 
 func TestNewUserHandler(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
 	type args struct {
 		log         *logrus.Entry
 		userservice userservice.UserServiceInterface
@@ -40,6 +44,8 @@ func TestNewUserHandler(t *testing.T) {
 }
 
 func TestUserHandler_List(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
 	type fields struct {
 		log         *logrus.Entry
 		userservice userservice.UserServiceInterface
@@ -107,6 +113,123 @@ func TestUserHandler_List(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			h := handlers.NewUserHandler(tt.fields.log, tt.fields.userservice)
 			h.List(tt.args.c)
+
+			if tt.args.c.Writer.Status() != tt.want {
+				t.Errorf("List() = %v, want %v", tt.args.c.Writer.Status(), tt.want)
+			}
+		})
+	}
+}
+
+func TestUserHandler_Create(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
+	type fields struct {
+		log         *logrus.Entry
+		userservice userservice.UserServiceInterface
+	}
+	type args struct {
+		c *gin.Context
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   int
+	}{
+		{
+			name: "user created success",
+			fields: func() fields {
+				u := &mocks.UserServiceInterface{}
+				u.On("Create", userservice.UserCreateRequest{
+					Username:    "username",
+					Password:    "password",
+					DisplayName: "Adminstrator",
+				}).Return(&userservice.User{}, nil)
+				return fields{
+					userservice: u,
+					log:         logrus.WithContext(context.TODO()),
+				}
+			}(),
+			args: func() args {
+				w := httptest.NewRecorder()
+				c, _ := gin.CreateTestContext(w)
+
+				c.Request = &http.Request{
+					URL:    &url.URL{},
+					Header: make(http.Header),
+					Body:   io.NopCloser(strings.NewReader(`{"username":"username","password":"password","display_name":"Adminstrator"}`)),
+				}
+
+				return args{c}
+			}(),
+			want: http.StatusCreated,
+		},
+		{
+			name: "user created fail invalid payload",
+			fields: func() fields {
+				u := &mocks.UserServiceInterface{}
+				u.On("Create", userservice.UserCreateRequest{
+					Username:    "username",
+					Password:    "password",
+					DisplayName: "Adminstrator",
+				}).Return(&userservice.User{}, nil)
+				return fields{
+					userservice: u,
+					log:         logrus.WithContext(context.TODO()),
+				}
+			}(),
+			args: func() args {
+				w := httptest.NewRecorder()
+				c, _ := gin.CreateTestContext(w)
+
+				c.Request = &http.Request{
+					URL:    &url.URL{},
+					Header: make(http.Header),
+					Body:   io.NopCloser(strings.NewReader(`{"username":"username","password":"","display_name":"Adminstrator"}`)),
+				}
+
+				return args{c}
+			}(),
+			want: http.StatusUnprocessableEntity,
+		},
+		{
+			name: "user created fail",
+			fields: func() fields {
+				u := &mocks.UserServiceInterface{}
+				u.On("Create", userservice.UserCreateRequest{
+					Username:    "username",
+					Password:    "password",
+					DisplayName: "Adminstrator",
+				}).Return(nil, errors.New("create error"))
+				return fields{
+					userservice: u,
+					log:         logrus.WithContext(context.TODO()),
+				}
+			}(),
+			args: func() args {
+				w := httptest.NewRecorder()
+				c, _ := gin.CreateTestContext(w)
+
+				c.Request = &http.Request{
+					URL:    &url.URL{},
+					Header: make(http.Header),
+					Body:   io.NopCloser(strings.NewReader(`{"username":"username","password":"password","display_name":"Adminstrator"}`)),
+				}
+
+				return args{c}
+			}(),
+			want: http.StatusInternalServerError,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			h := handlers.NewUserHandler(tt.fields.log, tt.fields.userservice)
+			h.Create(tt.args.c)
+
+			if tt.args.c.Writer.Status() != tt.want {
+				t.Errorf("Create() = %v, want %v", tt.args.c.Writer.Status(), tt.want)
+			}
 		})
 	}
 }
