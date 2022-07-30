@@ -22,6 +22,8 @@ services:
       - JWT_SIGNING_KEY=mykey
       - JWT_ALLOW_METHOD=HMAC
       - JWT_EXPIRED_IN=86400
+    volumes:
+      - ./migrations:/var/app/migrations
     depends_on:
       - db
 
