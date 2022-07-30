@@ -35,6 +35,43 @@ func (_m *UserServiceInterface) Create(r userservice.UserCreateRequest) (userser
 	return r0, r1
 }
 
+// Delete provides a mock function with given fields: user
+func (_m *UserServiceInterface) Delete(user userservice.UserInterface) error {
+	ret := _m.Called(user)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(userservice.UserInterface) error); ok {
+		r0 = rf(user)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Get provides a mock function with given fields: id
+func (_m *UserServiceInterface) Get(id uint) (userservice.UserInterface, error) {
+	ret := _m.Called(id)
+
+	var r0 userservice.UserInterface
+	if rf, ok := ret.Get(0).(func(uint) userservice.UserInterface); ok {
+		r0 = rf(id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(userservice.UserInterface)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(uint) error); ok {
+		r1 = rf(id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetByUsername provides a mock function with given fields: username
 func (_m *UserServiceInterface) GetByUsername(username string) (userservice.UserInterface, error) {
 	ret := _m.Called(username)
@@ -74,6 +111,29 @@ func (_m *UserServiceInterface) List() ([]userservice.UserInterface, error) {
 	var r1 error
 	if rf, ok := ret.Get(1).(func() error); ok {
 		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Update provides a mock function with given fields: user, r
+func (_m *UserServiceInterface) Update(user userservice.UserInterface, r userservice.UserUpdateRequest) (userservice.UserInterface, error) {
+	ret := _m.Called(user, r)
+
+	var r0 userservice.UserInterface
+	if rf, ok := ret.Get(0).(func(userservice.UserInterface, userservice.UserUpdateRequest) userservice.UserInterface); ok {
+		r0 = rf(user, r)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(userservice.UserInterface)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(userservice.UserInterface, userservice.UserUpdateRequest) error); ok {
+		r1 = rf(user, r)
 	} else {
 		r1 = ret.Error(1)
 	}

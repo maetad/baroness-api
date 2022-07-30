@@ -31,5 +31,8 @@ func registerRouter(
 		userHandler := handlers.NewUserHandler(l, services.userservice)
 		userRoute.GET("/", userHandler.List)
 		userRoute.POST("/", userHandler.Create)
+		userRoute.GET("/:id", userHandler.Get)
+		userRoute.PUT("/:id", userHandler.Update)
+		userRoute.DELETE("/:id", userHandler.Delete)
 	}
 }
