@@ -2,6 +2,7 @@ package userservice
 
 import (
 	"github.com/maetad/baroness-api/internal/database"
+	"github.com/maetad/baroness-api/internal/model"
 )
 
 type UserService struct {
@@ -9,25 +10,25 @@ type UserService struct {
 }
 
 type UserServiceInterface interface {
-	List() ([]UserInterface, error)
-	Create(r UserCreateRequest) (UserInterface, error)
-	Get(id uint) (UserInterface, error)
-	GetByUsername(username string) (UserInterface, error)
-	Update(user UserInterface, r UserUpdateRequest) (UserInterface, error)
-	Delete(user UserInterface) error
+	List() ([]model.UserInterface, error)
+	Create(r UserCreateRequest) (model.UserInterface, error)
+	Get(id uint) (model.UserInterface, error)
+	GetByUsername(username string) (model.UserInterface, error)
+	Update(user model.UserInterface, r UserUpdateRequest) (model.UserInterface, error)
+	Delete(user model.UserInterface) error
 }
 
 func New(db database.DatabaseInterface) UserServiceInterface {
 	return UserService{db}
 }
 
-func (s UserService) List() ([]UserInterface, error) {
-	var users []User
+func (s UserService) List() ([]model.UserInterface, error) {
+	var users []model.User
 	if result := s.db.Find(&users); result.Error != nil {
 		return nil, result.Error
 	}
 
-	var u = make([]UserInterface, len(users))
+	var u = make([]model.UserInterface, len(users))
 
 	for i := 0; i < len(users); i++ {
 		u[i] = &users[i]
@@ -36,8 +37,8 @@ func (s UserService) List() ([]UserInterface, error) {
 	return u, nil
 }
 
-func (s UserService) Create(r UserCreateRequest) (UserInterface, error) {
-	user := &User{
+func (s UserService) Create(r UserCreateRequest) (model.UserInterface, error) {
+	user := &model.User{
 		Username:    r.Username,
 		DisplayName: r.DisplayName,
 	}
@@ -51,8 +52,8 @@ func (s UserService) Create(r UserCreateRequest) (UserInterface, error) {
 	return user, nil
 }
 
-func (s UserService) Get(id uint) (UserInterface, error) {
-	user := &User{}
+func (s UserService) Get(id uint) (model.UserInterface, error) {
+	user := &model.User{}
 
 	if result := s.db.First(user, id); result.Error != nil {
 		return nil, result.Error
@@ -61,8 +62,8 @@ func (s UserService) Get(id uint) (UserInterface, error) {
 	return user, nil
 }
 
-func (s UserService) GetByUsername(username string) (UserInterface, error) {
-	user := &User{
+func (s UserService) GetByUsername(username string) (model.UserInterface, error) {
+	user := &model.User{
 		Username: username,
 	}
 
@@ -73,8 +74,8 @@ func (s UserService) GetByUsername(username string) (UserInterface, error) {
 	return user, nil
 }
 
-func (s UserService) Update(user UserInterface, r UserUpdateRequest) (UserInterface, error) {
-	u := user.(*User)
+func (s UserService) Update(user model.UserInterface, r UserUpdateRequest) (model.UserInterface, error) {
+	u := user.(*model.User)
 	u.DisplayName = r.DisplayName
 	if r.Password != "" {
 		u.SetPassword(r.Password)
@@ -87,7 +88,6 @@ func (s UserService) Update(user UserInterface, r UserUpdateRequest) (UserInterf
 	return u, nil
 }
 
-func (s UserService) Delete(user UserInterface) error {
-	result := s.db.Delete(user)
-	return result.Error
+func (s UserService) Delete(user model.UserInterface) error {
+	return s.db.Delete(user).Error
 }

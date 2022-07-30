@@ -1,11 +1,10 @@
-package userservice_test
+package model_test
 
 import (
 	"reflect"
 	"testing"
 
 	"github.com/maetad/baroness-api/internal/model"
-	"github.com/maetad/baroness-api/internal/services/userservice"
 )
 
 func TestUser_SetPassword(t *testing.T) {
@@ -31,7 +30,7 @@ func TestUser_SetPassword(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			u := &userservice.User{
+			u := &model.User{
 				Username:    tt.fields.Username,
 				DisplayName: tt.fields.DisplayName,
 			}
@@ -78,7 +77,7 @@ func TestUser_ValidatePassword(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			u := &userservice.User{
+			u := &model.User{
 				Username:    tt.fields.Username,
 				Password:    tt.fields.Password,
 				DisplayName: tt.fields.DisplayName,
@@ -116,7 +115,7 @@ func TestUser_GetClaims(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			u := &userservice.User{
+			u := &model.User{
 				Model:       tt.fields.Model,
 				Username:    tt.fields.Username,
 				Password:    tt.fields.Password,

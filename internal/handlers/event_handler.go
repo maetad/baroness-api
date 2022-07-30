@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/maetad/baroness-api/internal/model"
 	"github.com/maetad/baroness-api/internal/services/eventservice"
 	"github.com/sirupsen/logrus"
 )
@@ -101,15 +102,15 @@ func (h *EventHandler) Update(c *gin.Context) {
 
 func (h *EventHandler) Delete(c *gin.Context) {
 	var (
-		currentEvent *eventservice.Event
+		currentEvent *model.Event
 		ok           bool
 		id           int
 		err          error
-		event        *eventservice.Event
+		event        *model.Event
 	)
 
-	if currentEvent, ok = c.MustGet("event").(*eventservice.Event); !ok {
-		h.log.Error(`Delete(): c.MustGet("event") is not *eventservice.Event`)
+	if currentEvent, ok = c.MustGet("event").(*model.Event); !ok {
+		h.log.Error(`Delete(): c.MustGet("event") is not *model.Event`)
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}

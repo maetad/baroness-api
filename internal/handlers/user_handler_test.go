@@ -63,7 +63,7 @@ func TestUserHandler_List(t *testing.T) {
 		{
 			name: "listed success",
 			fields: func() fields {
-				users := make([]userservice.UserInterface, 1)
+				users := make([]model.UserInterface, 1)
 				userservice := &mocks.UserServiceInterface{}
 				userservice.On("List").
 					Return(users, nil)
@@ -146,7 +146,7 @@ func TestUserHandler_Create(t *testing.T) {
 					Username:    "username",
 					Password:    "password",
 					DisplayName: "Adminstrator",
-				}).Return(&userservice.User{}, nil)
+				}).Return(&model.User{}, nil)
 				return fields{
 					userservice: u,
 					log:         logrus.WithContext(context.TODO()),
@@ -174,7 +174,7 @@ func TestUserHandler_Create(t *testing.T) {
 					Username:    "username",
 					Password:    "password",
 					DisplayName: "Adminstrator",
-				}).Return(&userservice.User{}, nil)
+				}).Return(&model.User{}, nil)
 				return fields{
 					userservice: u,
 					log:         logrus.WithContext(context.TODO()),
@@ -252,7 +252,7 @@ func TestUserHandler_Get(t *testing.T) {
 		{
 			name: "user found",
 			fields: func() fields {
-				user := &userservice.User{}
+				user := &model.User{}
 				userservice := &mocks.UserServiceInterface{}
 				userservice.On("Get", uint(1)).
 					Return(user, nil)
@@ -372,7 +372,7 @@ func TestUserHandler_Update(t *testing.T) {
 		{
 			name: "user update success",
 			fields: func() fields {
-				user := &userservice.User{}
+				user := &model.User{}
 				u := &mocks.UserServiceInterface{}
 
 				u.On("Get", uint(1)).Return(user, nil)
@@ -381,7 +381,7 @@ func TestUserHandler_Update(t *testing.T) {
 					"Update",
 					user,
 					userservice.UserUpdateRequest{DisplayName: "display_name", Password: "password"},
-				).Return(&userservice.User{
+				).Return(&model.User{
 					DisplayName: "display_name",
 					Password:    "password",
 				}, nil)
@@ -447,7 +447,7 @@ func TestUserHandler_Update(t *testing.T) {
 		{
 			name: "body invalid",
 			fields: func() fields {
-				user := &userservice.User{}
+				user := &model.User{}
 				u := &mocks.UserServiceInterface{}
 
 				u.On("Get", uint(1)).Return(user, nil)
@@ -481,7 +481,7 @@ func TestUserHandler_Update(t *testing.T) {
 		{
 			name: "user update fail",
 			fields: func() fields {
-				user := &userservice.User{}
+				user := &model.User{}
 				u := &mocks.UserServiceInterface{}
 
 				u.On("Get", uint(1)).Return(user, nil)
@@ -579,7 +579,7 @@ func TestUserHandler_Delete(t *testing.T) {
 		{
 			name: "user delete success",
 			fields: func() fields {
-				user := &userservice.User{}
+				user := &model.User{}
 				u := &mocks.UserServiceInterface{}
 
 				u.On("Get", uint(1)).Return(user, nil)
@@ -606,7 +606,7 @@ func TestUserHandler_Delete(t *testing.T) {
 					},
 				}
 
-				c.Set("user", &userservice.User{})
+				c.Set("user", &model.User{})
 
 				return args{c}
 			}(),
@@ -639,7 +639,7 @@ func TestUserHandler_Delete(t *testing.T) {
 					},
 				}
 
-				c.Set("user", &userservice.User{})
+				c.Set("user", &model.User{})
 
 				return args{c}
 			}(),
@@ -648,7 +648,7 @@ func TestUserHandler_Delete(t *testing.T) {
 		{
 			name: "user delete fail",
 			fields: func() fields {
-				user := &userservice.User{}
+				user := &model.User{}
 				u := &mocks.UserServiceInterface{}
 
 				u.On("Get", uint(1)).Return(user, nil)
@@ -675,7 +675,7 @@ func TestUserHandler_Delete(t *testing.T) {
 					},
 				}
 
-				c.Set("user", &userservice.User{})
+				c.Set("user", &model.User{})
 
 				return args{c}
 			}(),
@@ -704,7 +704,7 @@ func TestUserHandler_Delete(t *testing.T) {
 					},
 				}
 
-				c.Set("user", &userservice.User{})
+				c.Set("user", &model.User{})
 
 				return args{c}
 			}(),
@@ -742,7 +742,7 @@ func TestUserHandler_Delete(t *testing.T) {
 		{
 			name: "cannot suicide",
 			fields: func() fields {
-				user := &userservice.User{}
+				user := &model.User{}
 				u := &mocks.UserServiceInterface{}
 
 				u.On("Get", uint(1)).Return(user, nil)
@@ -769,7 +769,7 @@ func TestUserHandler_Delete(t *testing.T) {
 					},
 				}
 
-				c.Set("user", &userservice.User{Model: model.Model{ID: 1}})
+				c.Set("user", &model.User{Model: model.Model{ID: 1}})
 
 				return args{c}
 			}(),

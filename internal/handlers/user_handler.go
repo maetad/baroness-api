@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/maetad/baroness-api/internal/model"
 	"github.com/maetad/baroness-api/internal/services/userservice"
 	"github.com/sirupsen/logrus"
 )
@@ -101,15 +102,15 @@ func (h *UserHandler) Update(c *gin.Context) {
 
 func (h *UserHandler) Delete(c *gin.Context) {
 	var (
-		currentUser *userservice.User
+		currentUser *model.User
 		ok          bool
 		id          int
 		err         error
-		user        userservice.UserInterface
+		user        model.UserInterface
 	)
 
-	if currentUser, ok = c.MustGet("user").(*userservice.User); !ok {
-		h.log.Error(`Delete(): c.MustGet("user") is not *userservice.User`)
+	if currentUser, ok = c.MustGet("user").(*model.User); !ok {
+		h.log.Error(`Delete(): c.MustGet("user") is not *model.User`)
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}

@@ -1,7 +1,6 @@
-package userservice
+package model
 
 import (
-	"github.com/maetad/baroness-api/internal/model"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -11,7 +10,7 @@ type UserInterface interface {
 }
 
 type User struct {
-	model.Model
+	Model
 	Username    string `json:"username"`
 	Password    string `json:"-"`
 	DisplayName string `json:"display_name"`

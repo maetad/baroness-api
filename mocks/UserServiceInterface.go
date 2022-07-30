@@ -3,6 +3,7 @@
 package mocks
 
 import (
+	model "github.com/maetad/baroness-api/internal/model"
 	userservice "github.com/maetad/baroness-api/internal/services/userservice"
 	mock "github.com/stretchr/testify/mock"
 )
@@ -13,15 +14,15 @@ type UserServiceInterface struct {
 }
 
 // Create provides a mock function with given fields: r
-func (_m *UserServiceInterface) Create(r userservice.UserCreateRequest) (userservice.UserInterface, error) {
+func (_m *UserServiceInterface) Create(r userservice.UserCreateRequest) (model.UserInterface, error) {
 	ret := _m.Called(r)
 
-	var r0 userservice.UserInterface
-	if rf, ok := ret.Get(0).(func(userservice.UserCreateRequest) userservice.UserInterface); ok {
+	var r0 model.UserInterface
+	if rf, ok := ret.Get(0).(func(userservice.UserCreateRequest) model.UserInterface); ok {
 		r0 = rf(r)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(userservice.UserInterface)
+			r0 = ret.Get(0).(model.UserInterface)
 		}
 	}
 
@@ -36,11 +37,11 @@ func (_m *UserServiceInterface) Create(r userservice.UserCreateRequest) (userser
 }
 
 // Delete provides a mock function with given fields: user
-func (_m *UserServiceInterface) Delete(user userservice.UserInterface) error {
+func (_m *UserServiceInterface) Delete(user model.UserInterface) error {
 	ret := _m.Called(user)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(userservice.UserInterface) error); ok {
+	if rf, ok := ret.Get(0).(func(model.UserInterface) error); ok {
 		r0 = rf(user)
 	} else {
 		r0 = ret.Error(0)
@@ -50,15 +51,15 @@ func (_m *UserServiceInterface) Delete(user userservice.UserInterface) error {
 }
 
 // Get provides a mock function with given fields: id
-func (_m *UserServiceInterface) Get(id uint) (userservice.UserInterface, error) {
+func (_m *UserServiceInterface) Get(id uint) (model.UserInterface, error) {
 	ret := _m.Called(id)
 
-	var r0 userservice.UserInterface
-	if rf, ok := ret.Get(0).(func(uint) userservice.UserInterface); ok {
+	var r0 model.UserInterface
+	if rf, ok := ret.Get(0).(func(uint) model.UserInterface); ok {
 		r0 = rf(id)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(userservice.UserInterface)
+			r0 = ret.Get(0).(model.UserInterface)
 		}
 	}
 
@@ -73,15 +74,15 @@ func (_m *UserServiceInterface) Get(id uint) (userservice.UserInterface, error) 
 }
 
 // GetByUsername provides a mock function with given fields: username
-func (_m *UserServiceInterface) GetByUsername(username string) (userservice.UserInterface, error) {
+func (_m *UserServiceInterface) GetByUsername(username string) (model.UserInterface, error) {
 	ret := _m.Called(username)
 
-	var r0 userservice.UserInterface
-	if rf, ok := ret.Get(0).(func(string) userservice.UserInterface); ok {
+	var r0 model.UserInterface
+	if rf, ok := ret.Get(0).(func(string) model.UserInterface); ok {
 		r0 = rf(username)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(userservice.UserInterface)
+			r0 = ret.Get(0).(model.UserInterface)
 		}
 	}
 
@@ -96,15 +97,15 @@ func (_m *UserServiceInterface) GetByUsername(username string) (userservice.User
 }
 
 // List provides a mock function with given fields:
-func (_m *UserServiceInterface) List() ([]userservice.UserInterface, error) {
+func (_m *UserServiceInterface) List() ([]model.UserInterface, error) {
 	ret := _m.Called()
 
-	var r0 []userservice.UserInterface
-	if rf, ok := ret.Get(0).(func() []userservice.UserInterface); ok {
+	var r0 []model.UserInterface
+	if rf, ok := ret.Get(0).(func() []model.UserInterface); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]userservice.UserInterface)
+			r0 = ret.Get(0).([]model.UserInterface)
 		}
 	}
 
@@ -119,20 +120,20 @@ func (_m *UserServiceInterface) List() ([]userservice.UserInterface, error) {
 }
 
 // Update provides a mock function with given fields: user, r
-func (_m *UserServiceInterface) Update(user userservice.UserInterface, r userservice.UserUpdateRequest) (userservice.UserInterface, error) {
+func (_m *UserServiceInterface) Update(user model.UserInterface, r userservice.UserUpdateRequest) (model.UserInterface, error) {
 	ret := _m.Called(user, r)
 
-	var r0 userservice.UserInterface
-	if rf, ok := ret.Get(0).(func(userservice.UserInterface, userservice.UserUpdateRequest) userservice.UserInterface); ok {
+	var r0 model.UserInterface
+	if rf, ok := ret.Get(0).(func(model.UserInterface, userservice.UserUpdateRequest) model.UserInterface); ok {
 		r0 = rf(user, r)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(userservice.UserInterface)
+			r0 = ret.Get(0).(model.UserInterface)
 		}
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(userservice.UserInterface, userservice.UserUpdateRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(model.UserInterface, userservice.UserUpdateRequest) error); ok {
 		r1 = rf(user, r)
 	} else {
 		r1 = ret.Error(1)

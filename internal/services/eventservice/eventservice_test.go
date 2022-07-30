@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/maetad/baroness-api/internal/database"
+	"github.com/maetad/baroness-api/internal/model"
 	"github.com/maetad/baroness-api/internal/services/eventservice"
 	"github.com/maetad/baroness-api/mocks"
 	"github.com/stretchr/testify/mock"
@@ -39,7 +40,7 @@ func TestEventService_List(t *testing.T) {
 	tests := []struct {
 		name    string
 		fields  fields
-		want    []eventservice.Event
+		want    []model.Event
 		wantErr bool
 	}{
 		{
@@ -53,7 +54,7 @@ func TestEventService_List(t *testing.T) {
 
 				return fields{db}
 			}(),
-			want: []eventservice.Event{},
+			want: []model.Event{},
 		},
 		{
 			name: "listed fail",
@@ -97,7 +98,7 @@ func TestEventService_Create(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    *eventservice.Event
+		want    *model.Event
 		wantErr bool
 	}{
 		{
@@ -120,7 +121,7 @@ func TestEventService_Create(t *testing.T) {
 					EndAt:    now,
 				},
 			},
-			want: &eventservice.Event{
+			want: &model.Event{
 				Name:     "event name",
 				Platform: []string{"platform 1", "platform 2"},
 				Channel:  []string{"channel 1", "channel 2"},
@@ -177,14 +178,14 @@ func TestEventService_Get(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    *eventservice.Event
+		want    *model.Event
 		wantErr bool
 	}{
 		{
 			name: "event found",
 			fields: func() fields {
 				db := &mocks.DatabaseInterface{}
-				db.On("First", mock.AnythingOfType("*eventservice.Event"), uint(1)).
+				db.On("First", mock.AnythingOfType("*model.Event"), uint(1)).
 					Return(&gorm.DB{
 						Error: nil,
 					})
@@ -194,13 +195,13 @@ func TestEventService_Get(t *testing.T) {
 			args: args{
 				id: 1,
 			},
-			want: &eventservice.Event{},
+			want: &model.Event{},
 		},
 		{
 			name: "event not found",
 			fields: func() fields {
 				db := &mocks.DatabaseInterface{}
-				db.On("First", mock.AnythingOfType("*eventservice.Event"), uint(1)).
+				db.On("First", mock.AnythingOfType("*model.Event"), uint(1)).
 					Return(&gorm.DB{
 						Error: errors.New("event not found"),
 					})
@@ -234,21 +235,21 @@ func TestEventService_Update(t *testing.T) {
 		db database.DatabaseInterface
 	}
 	type args struct {
-		event *eventservice.Event
+		event *model.Event
 		r     eventservice.EventUpdateRequest
 	}
 	tests := []struct {
 		name    string
 		fields  fields
 		args    args
-		want    *eventservice.Event
+		want    *model.Event
 		wantErr bool
 	}{
 		{
 			name: "event updated",
 			fields: func() fields {
 				db := &mocks.DatabaseInterface{}
-				db.On("Save", mock.AnythingOfType("*eventservice.Event")).
+				db.On("Save", mock.AnythingOfType("*model.Event")).
 					Return(&gorm.DB{
 						Error: nil,
 					})
@@ -256,7 +257,7 @@ func TestEventService_Update(t *testing.T) {
 				return fields{db}
 			}(),
 			args: args{
-				event: &eventservice.Event{
+				event: &model.Event{
 					Name:     "event name",
 					Platform: []string{"platform 1", "platform 2"},
 					Channel:  []string{"channel 1", "channel 2"},
@@ -271,7 +272,7 @@ func TestEventService_Update(t *testing.T) {
 					EndAt:    now,
 				},
 			},
-			want: &eventservice.Event{
+			want: &model.Event{
 				Name:     "new event name",
 				Platform: []string{"platform 1", "platform 2"},
 				Channel:  []string{"channel 1", "channel 2"},
@@ -283,7 +284,7 @@ func TestEventService_Update(t *testing.T) {
 			name: "event update error",
 			fields: func() fields {
 				db := &mocks.DatabaseInterface{}
-				db.On("Save", mock.AnythingOfType("*eventservice.Event")).
+				db.On("Save", mock.AnythingOfType("*model.Event")).
 					Return(&gorm.DB{
 						Error: errors.New("event update error"),
 					})
@@ -291,7 +292,7 @@ func TestEventService_Update(t *testing.T) {
 				return fields{db}
 			}(),
 			args: args{
-				event: &eventservice.Event{},
+				event: &model.Event{},
 				r:     eventservice.EventUpdateRequest{},
 			},
 			wantErr: true,
@@ -317,7 +318,7 @@ func TestEventService_Delete(t *testing.T) {
 		db database.DatabaseInterface
 	}
 	type args struct {
-		event *eventservice.Event
+		event *model.Event
 	}
 	tests := []struct {
 		name    string
@@ -329,28 +330,28 @@ func TestEventService_Delete(t *testing.T) {
 			name: "delete success",
 			fields: func() fields {
 				db := &mocks.DatabaseInterface{}
-				db.On("Delete", mock.AnythingOfType("*eventservice.Event")).
+				db.On("Delete", mock.AnythingOfType("*model.Event")).
 					Return(&gorm.DB{
 						Error: nil,
 					})
 				return fields{db}
 			}(),
 			args: args{
-				event: &eventservice.Event{},
+				event: &model.Event{},
 			},
 		},
 		{
 			name: "delete fail",
 			fields: func() fields {
 				db := &mocks.DatabaseInterface{}
-				db.On("Delete", mock.AnythingOfType("*eventservice.Event")).
+				db.On("Delete", mock.AnythingOfType("*model.Event")).
 					Return(&gorm.DB{
 						Error: errors.New("delete fail"),
 					})
 				return fields{db}
 			}(),
 			args: args{
-				event: &eventservice.Event{},
+				event: &model.Event{},
 			},
 			wantErr: true,
 		},

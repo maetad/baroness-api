@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/maetad/baroness-api/internal/database"
+	"github.com/maetad/baroness-api/internal/model"
 	"github.com/maetad/baroness-api/internal/services/userservice"
 	"github.com/maetad/baroness-api/mocks"
 	"github.com/stretchr/testify/mock"
@@ -42,7 +43,7 @@ func TestUserService_Create(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    *userservice.User
+		want    *model.User
 		wantErr bool
 	}{
 		{
@@ -57,7 +58,7 @@ func TestUserService_Create(t *testing.T) {
 					DisplayName: "Administrator",
 				},
 			},
-			want: &userservice.User{
+			want: &model.User{
 				Username:    "admin",
 				Password:    "$2a$10$EIbuP5hbywq0xp183mHeBe0cN6TO00FNK7sAZJGKXWr9V6A2pVLkS",
 				DisplayName: "Administrator",
@@ -81,7 +82,7 @@ func TestUserService_Create(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			db.Mock.ExpectedCalls = nil
-			db.On("Create", mock.AnythingOfType("*userservice.User")).
+			db.On("Create", mock.AnythingOfType("*model.User")).
 				Return(&gorm.DB{
 					Error: func() error {
 						if tt.wantErr {
@@ -100,7 +101,7 @@ func TestUserService_Create(t *testing.T) {
 			}
 
 			if tt.want != nil {
-				user := got.(*userservice.User)
+				user := got.(*model.User)
 
 				if err := got.ValidatePassword(tt.args.r.Password); err != nil {
 					t.Errorf("UserService.Create() password hashed invalid %v", err)
@@ -132,7 +133,7 @@ func TestUserService_GetByUsername(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    *userservice.User
+		want    *model.User
 		wantErr bool
 	}{
 		{
@@ -143,7 +144,7 @@ func TestUserService_GetByUsername(t *testing.T) {
 			args: args{
 				username: "admin",
 			},
-			want: &userservice.User{
+			want: &model.User{
 				Username: "admin",
 			},
 		},
@@ -161,7 +162,7 @@ func TestUserService_GetByUsername(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			db.Mock.ExpectedCalls = nil
-			db.On("First", mock.AnythingOfType("*userservice.User")).
+			db.On("First", mock.AnythingOfType("*model.User")).
 				Return(&gorm.DB{
 					Error: func() error {
 						if tt.wantErr {
@@ -197,7 +198,7 @@ func TestUserService_List(t *testing.T) {
 	tests := []struct {
 		name    string
 		fields  fields
-		want    []userservice.UserInterface
+		want    []model.UserInterface
 		wantErr bool
 	}{
 		{
@@ -211,7 +212,7 @@ func TestUserService_List(t *testing.T) {
 
 				return fields{db}
 			}(),
-			want: []userservice.UserInterface{},
+			want: []model.UserInterface{},
 		},
 		{
 			name: "listed fail",
@@ -253,14 +254,14 @@ func TestUserService_Get(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    userservice.UserInterface
+		want    model.UserInterface
 		wantErr bool
 	}{
 		{
 			name: "user found",
 			fields: func() fields {
 				db := &mocks.DatabaseInterface{}
-				db.On("First", mock.AnythingOfType("*userservice.User"), uint(1)).
+				db.On("First", mock.AnythingOfType("*model.User"), uint(1)).
 					Return(&gorm.DB{
 						Error: nil,
 					})
@@ -270,13 +271,13 @@ func TestUserService_Get(t *testing.T) {
 			args: args{
 				id: 1,
 			},
-			want: &userservice.User{},
+			want: &model.User{},
 		},
 		{
 			name: "user not found",
 			fields: func() fields {
 				db := &mocks.DatabaseInterface{}
-				db.On("First", mock.AnythingOfType("*userservice.User"), uint(1)).
+				db.On("First", mock.AnythingOfType("*model.User"), uint(1)).
 					Return(&gorm.DB{
 						Error: errors.New("user not found"),
 					})
@@ -309,28 +310,28 @@ func TestUserService_Update(t *testing.T) {
 		db database.DatabaseInterface
 	}
 	type args struct {
-		user userservice.UserInterface
+		user model.UserInterface
 		r    userservice.UserUpdateRequest
 	}
 	tests := []struct {
 		name    string
 		fields  fields
 		args    args
-		want    userservice.UserInterface
+		want    model.UserInterface
 		wantErr bool
 	}{
 		{
 			name: "update with password",
 			fields: func() fields {
 				db := &mocks.DatabaseInterface{}
-				db.On("Save", mock.AnythingOfType("*userservice.User")).
+				db.On("Save", mock.AnythingOfType("*model.User")).
 					Return(&gorm.DB{
 						Error: nil,
 					})
 				return fields{db}
 			}(),
 			args: args{
-				user: &userservice.User{
+				user: &model.User{
 					DisplayName: "old",
 					Password:    "old",
 				},
@@ -339,7 +340,7 @@ func TestUserService_Update(t *testing.T) {
 					Password:    "password",
 				},
 			},
-			want: &userservice.User{
+			want: &model.User{
 				DisplayName: "new",
 				Password:    "$2a$10$EIbuP5hbywq0xp183mHeBe0cN6TO00FNK7sAZJGKXWr9V6A2pVLkS",
 			},
@@ -348,14 +349,14 @@ func TestUserService_Update(t *testing.T) {
 			name: "update with out password",
 			fields: func() fields {
 				db := &mocks.DatabaseInterface{}
-				db.On("Save", mock.AnythingOfType("*userservice.User")).
+				db.On("Save", mock.AnythingOfType("*model.User")).
 					Return(&gorm.DB{
 						Error: nil,
 					})
 				return fields{db}
 			}(),
 			args: args{
-				user: &userservice.User{
+				user: &model.User{
 					DisplayName: "old",
 					Password:    "$2a$10$EIbuP5hbywq0xp183mHeBe0cN6TO00FNK7sAZJGKXWr9V6A2pVLkS",
 				},
@@ -363,7 +364,7 @@ func TestUserService_Update(t *testing.T) {
 					DisplayName: "new",
 				},
 			},
-			want: &userservice.User{
+			want: &model.User{
 				DisplayName: "new",
 				Password:    "$2a$10$EIbuP5hbywq0xp183mHeBe0cN6TO00FNK7sAZJGKXWr9V6A2pVLkS",
 			},
@@ -372,14 +373,14 @@ func TestUserService_Update(t *testing.T) {
 			name: "update error",
 			fields: func() fields {
 				db := &mocks.DatabaseInterface{}
-				db.On("Save", mock.AnythingOfType("*userservice.User")).
+				db.On("Save", mock.AnythingOfType("*model.User")).
 					Return(&gorm.DB{
 						Error: errors.New("update error"),
 					})
 				return fields{db}
 			}(),
 			args: args{
-				user: &userservice.User{},
+				user: &model.User{},
 				r:    userservice.UserUpdateRequest{},
 			},
 			wantErr: true,
@@ -395,7 +396,7 @@ func TestUserService_Update(t *testing.T) {
 			}
 
 			if tt.want != nil {
-				user := got.(*userservice.User)
+				user := got.(*model.User)
 
 				if tt.args.r.Password != "" {
 					if err := got.ValidatePassword(tt.args.r.Password); err != nil {
@@ -406,7 +407,7 @@ func TestUserService_Update(t *testing.T) {
 				// ignore password difference
 				user.Password = ""
 				clone := tt.want
-				clone.(*userservice.User).Password = ""
+				clone.(*model.User).Password = ""
 
 				if !reflect.DeepEqual(user, clone) {
 					t.Errorf("UserService.Update() = %v, want %v", user, tt.want)
@@ -423,7 +424,7 @@ func TestUserService_Delete(t *testing.T) {
 		db database.DatabaseInterface
 	}
 	type args struct {
-		user userservice.UserInterface
+		user model.UserInterface
 	}
 	tests := []struct {
 		name    string
@@ -435,28 +436,28 @@ func TestUserService_Delete(t *testing.T) {
 			name: "delete success",
 			fields: func() fields {
 				db := &mocks.DatabaseInterface{}
-				db.On("Delete", mock.AnythingOfType("*userservice.User")).
+				db.On("Delete", mock.AnythingOfType("*model.User")).
 					Return(&gorm.DB{
 						Error: nil,
 					})
 				return fields{db}
 			}(),
 			args: args{
-				user: &userservice.User{},
+				user: &model.User{},
 			},
 		},
 		{
 			name: "delete fail",
 			fields: func() fields {
 				db := &mocks.DatabaseInterface{}
-				db.On("Delete", mock.AnythingOfType("*userservice.User")).
+				db.On("Delete", mock.AnythingOfType("*model.User")).
 					Return(&gorm.DB{
 						Error: errors.New("delete fail"),
 					})
 				return fields{db}
 			}(),
 			args: args{
-				user: &userservice.User{},
+				user: &model.User{},
 			},
 			wantErr: true,
 		},

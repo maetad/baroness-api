@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/maetad/baroness-api/internal/config"
+	"github.com/maetad/baroness-api/internal/model"
 	"github.com/maetad/baroness-api/internal/services/authservice"
 	"github.com/maetad/baroness-api/internal/services/userservice"
 	"github.com/sirupsen/logrus"
@@ -40,7 +41,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	}
 
 	var (
-		user userservice.UserInterface
+		user model.UserInterface
 		err  error
 	)
 
@@ -56,7 +57,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	token, err := h.authservice.GenerateToken(user.(*userservice.User), h.options.JWTExpiredIn)
+	token, err := h.authservice.GenerateToken(user.(*model.User), h.options.JWTExpiredIn)
 	if err != nil {
 		h.log.WithError(err).Errorf("Login(): h.authservice.GenerateToken error %v", err)
 		c.AbortWithStatus(http.StatusInternalServerError)
@@ -72,7 +73,7 @@ func (h *AuthHandler) Authorize(c *gin.Context) {
 
 	var (
 		claims jwt.MapClaims
-		user   userservice.UserInterface
+		user   model.UserInterface
 		err    error
 	)
 

@@ -63,7 +63,7 @@ func TestEventHandler_List(t *testing.T) {
 		{
 			name: "listed success",
 			fields: func() fields {
-				events := make([]eventservice.Event, 1)
+				events := make([]model.Event, 1)
 				eventservice := &mocks.EventServiceInterface{}
 				eventservice.On("List").
 					Return(events, nil)
@@ -146,7 +146,7 @@ func TestEventHandler_Create(t *testing.T) {
 					Name:     "event name",
 					Platform: []string{"platform 1", "platform 2"},
 					Channel:  []string{"channel 1", "channel 2"},
-				}).Return(&eventservice.Event{}, nil)
+				}).Return(&model.Event{}, nil)
 				return fields{
 					eventservice: u,
 					log:          logrus.WithContext(context.TODO()),
@@ -174,7 +174,7 @@ func TestEventHandler_Create(t *testing.T) {
 					Name:     "event name",
 					Platform: []string{"platform 1", "platform 2"},
 					Channel:  []string{"channel 1", "channel 2"},
-				}).Return(&eventservice.Event{}, nil)
+				}).Return(&model.Event{}, nil)
 				return fields{
 					eventservice: u,
 					log:          logrus.WithContext(context.TODO()),
@@ -252,7 +252,7 @@ func TestEventHandler_Get(t *testing.T) {
 		{
 			name: "event found",
 			fields: func() fields {
-				event := &eventservice.Event{}
+				event := &model.Event{}
 				eventservice := &mocks.EventServiceInterface{}
 				eventservice.On("Get", uint(1)).
 					Return(event, nil)
@@ -372,7 +372,7 @@ func TestEventHandler_Update(t *testing.T) {
 		{
 			name: "event update success",
 			fields: func() fields {
-				event := &eventservice.Event{}
+				event := &model.Event{}
 				u := &mocks.EventServiceInterface{}
 
 				u.On("Get", uint(1)).Return(event, nil)
@@ -385,7 +385,7 @@ func TestEventHandler_Update(t *testing.T) {
 						Platform: []string{"platform 1", "platform 2"},
 						Channel:  []string{"channel 1", "channel 2"},
 					},
-				).Return(&eventservice.Event{
+				).Return(&model.Event{
 					Name:     "new event name",
 					Platform: []string{"platform 1", "platform 2"},
 					Channel:  []string{"channel 1", "channel 2"},
@@ -452,7 +452,7 @@ func TestEventHandler_Update(t *testing.T) {
 		{
 			name: "body invalid",
 			fields: func() fields {
-				event := &eventservice.Event{}
+				event := &model.Event{}
 				u := &mocks.EventServiceInterface{}
 
 				u.On("Get", uint(1)).Return(event, nil)
@@ -486,7 +486,7 @@ func TestEventHandler_Update(t *testing.T) {
 		{
 			name: "event update fail",
 			fields: func() fields {
-				event := &eventservice.Event{}
+				event := &model.Event{}
 				u := &mocks.EventServiceInterface{}
 
 				u.On("Get", uint(1)).Return(event, nil)
@@ -588,7 +588,7 @@ func TestEventHandler_Delete(t *testing.T) {
 		{
 			name: "event delete success",
 			fields: func() fields {
-				event := &eventservice.Event{}
+				event := &model.Event{}
 				u := &mocks.EventServiceInterface{}
 
 				u.On("Get", uint(1)).Return(event, nil)
@@ -615,7 +615,7 @@ func TestEventHandler_Delete(t *testing.T) {
 					},
 				}
 
-				c.Set("event", &eventservice.Event{})
+				c.Set("event", &model.Event{})
 
 				return args{c}
 			}(),
@@ -648,7 +648,7 @@ func TestEventHandler_Delete(t *testing.T) {
 					},
 				}
 
-				c.Set("event", &eventservice.Event{})
+				c.Set("event", &model.Event{})
 
 				return args{c}
 			}(),
@@ -657,7 +657,7 @@ func TestEventHandler_Delete(t *testing.T) {
 		{
 			name: "event delete fail",
 			fields: func() fields {
-				event := &eventservice.Event{}
+				event := &model.Event{}
 				u := &mocks.EventServiceInterface{}
 
 				u.On("Get", uint(1)).Return(event, nil)
@@ -684,7 +684,7 @@ func TestEventHandler_Delete(t *testing.T) {
 					},
 				}
 
-				c.Set("event", &eventservice.Event{})
+				c.Set("event", &model.Event{})
 
 				return args{c}
 			}(),
@@ -713,7 +713,7 @@ func TestEventHandler_Delete(t *testing.T) {
 					},
 				}
 
-				c.Set("event", &eventservice.Event{})
+				c.Set("event", &model.Event{})
 
 				return args{c}
 			}(),
@@ -751,7 +751,7 @@ func TestEventHandler_Delete(t *testing.T) {
 		{
 			name: "cannot suicide",
 			fields: func() fields {
-				event := &eventservice.Event{}
+				event := &model.Event{}
 				u := &mocks.EventServiceInterface{}
 
 				u.On("Get", uint(1)).Return(event, nil)
@@ -778,7 +778,7 @@ func TestEventHandler_Delete(t *testing.T) {
 					},
 				}
 
-				c.Set("event", &eventservice.Event{Model: model.Model{ID: 1}})
+				c.Set("event", &model.Event{Model: model.Model{ID: 1}})
 
 				return args{c}
 			}(),

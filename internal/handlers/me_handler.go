@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/maetad/baroness-api/internal/model"
 	"github.com/maetad/baroness-api/internal/services/userservice"
 	"github.com/sirupsen/logrus"
 )
@@ -22,12 +23,12 @@ func NewMeHandler(
 
 func (h *MeHandler) Get(c *gin.Context) {
 	var (
-		user *userservice.User
+		user *model.User
 		ok   bool
 	)
 
-	if user, ok = c.MustGet("user").(*userservice.User); !ok {
-		h.log.Error(`Delete(): c.MustGet("user") is not *userservice.User`)
+	if user, ok = c.MustGet("user").(*model.User); !ok {
+		h.log.Error(`Delete(): c.MustGet("user") is not *model.User`)
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
@@ -37,13 +38,13 @@ func (h *MeHandler) Get(c *gin.Context) {
 
 func (h *MeHandler) Update(c *gin.Context) {
 	var (
-		user *userservice.User
+		user *model.User
 		r    userservice.UserUpdateRequest
 		ok   bool
 	)
 
-	if user, ok = c.MustGet("user").(*userservice.User); !ok {
-		h.log.Error(`Delete(): c.MustGet("user") is not *userservice.User`)
+	if user, ok = c.MustGet("user").(*model.User); !ok {
+		h.log.Error(`Delete(): c.MustGet("user") is not *model.User`)
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}

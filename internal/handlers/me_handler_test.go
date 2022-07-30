@@ -12,6 +12,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/maetad/baroness-api/internal/handlers"
+	"github.com/maetad/baroness-api/internal/model"
 	"github.com/maetad/baroness-api/internal/services/userservice"
 	"github.com/maetad/baroness-api/mocks"
 	"github.com/sirupsen/logrus"
@@ -48,7 +49,7 @@ func TestMeHandler_Get(t *testing.T) {
 					Header: make(http.Header),
 				}
 
-				c.Set("user", &userservice.User{})
+				c.Set("user", &model.User{})
 
 				return args{c}
 			}(),
@@ -110,9 +111,9 @@ func TestMeHandler_Update(t *testing.T) {
 
 				u.On(
 					"Update",
-					mock.AnythingOfType("*userservice.User"),
+					mock.AnythingOfType("*model.User"),
 					userservice.UserUpdateRequest{DisplayName: "display_name", Password: "password"},
-				).Return(&userservice.User{
+				).Return(&model.User{
 					DisplayName: "display_name",
 					Password:    "password",
 				}, nil)
@@ -132,7 +133,7 @@ func TestMeHandler_Update(t *testing.T) {
 					Body:   io.NopCloser(strings.NewReader(`{"display_name":"display_name","password":"password"}`)),
 				}
 
-				c.Set("user", &userservice.User{})
+				c.Set("user", &model.User{})
 
 				return args{c}
 			}(),
@@ -178,7 +179,7 @@ func TestMeHandler_Update(t *testing.T) {
 					Body:   io.NopCloser(strings.NewReader(`{"display___name":"display_name","password":"password"}`)),
 				}
 
-				c.Set("user", &userservice.User{})
+				c.Set("user", &model.User{})
 
 				return args{c}
 			}(),
@@ -191,7 +192,7 @@ func TestMeHandler_Update(t *testing.T) {
 
 				u.On(
 					"Update",
-					mock.AnythingOfType("*userservice.User"),
+					mock.AnythingOfType("*model.User"),
 					userservice.UserUpdateRequest{DisplayName: "display_name", Password: "password"},
 				).Return(nil, errors.New("update fail"))
 
@@ -210,7 +211,7 @@ func TestMeHandler_Update(t *testing.T) {
 					Body:   io.NopCloser(strings.NewReader(`{"display_name":"display_name","password":"password"}`)),
 				}
 
-				c.Set("user", &userservice.User{})
+				c.Set("user", &model.User{})
 
 				return args{c}
 			}(),

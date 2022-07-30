@@ -15,6 +15,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/maetad/baroness-api/internal/config"
 	"github.com/maetad/baroness-api/internal/handlers"
+	"github.com/maetad/baroness-api/internal/model"
 	"github.com/maetad/baroness-api/internal/services/authservice"
 	"github.com/maetad/baroness-api/internal/services/userservice"
 	"github.com/maetad/baroness-api/mocks"
@@ -145,7 +146,7 @@ func TestAuthHandler_Login(t *testing.T) {
 		{
 			name: "generate token fail",
 			fields: func() fields {
-				user := &userservice.User{
+				user := &model.User{
 					Username:    "admin",
 					DisplayName: "administrator",
 				}
@@ -184,7 +185,7 @@ func TestAuthHandler_Login(t *testing.T) {
 		{
 			name: "logged in",
 			fields: func() fields {
-				user := &userservice.User{
+				user := &model.User{
 					Username:    "admin",
 					DisplayName: "administrator",
 				}
@@ -391,7 +392,7 @@ func TestAuthHandler_Authorize(t *testing.T) {
 
 				u := &mocks.UserServiceInterface{}
 				u.On("GetByUsername", "admin").
-					Return(&userservice.User{}, nil)
+					Return(&model.User{}, nil)
 
 				f := fields{
 					log:         logrus.WithContext(context.TODO()),
