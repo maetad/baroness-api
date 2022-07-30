@@ -1,8 +1,8 @@
 package userservice
 
 import (
+	"github.com/pakkaparn/no-idea-api/internal/model"
 	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 )
 
 type UserInterface interface {
@@ -11,10 +11,10 @@ type UserInterface interface {
 }
 
 type User struct {
-	gorm.Model
-	Username    string
-	Password    string
-	DisplayName string
+	model.Model
+	Username    string `json:"username"`
+	Password    string `json:"-"`
+	DisplayName string `json:"display_name"`
 }
 
 func (u *User) SetPassword(password string) {

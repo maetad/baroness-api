@@ -58,6 +58,29 @@ func (_m *UserServiceInterface) GetByUsername(username string) (userservice.User
 	return r0, r1
 }
 
+// List provides a mock function with given fields:
+func (_m *UserServiceInterface) List() ([]userservice.UserInterface, error) {
+	ret := _m.Called()
+
+	var r0 []userservice.UserInterface
+	if rf, ok := ret.Get(0).(func() []userservice.UserInterface); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]userservice.UserInterface)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type mockConstructorTestingTNewUserServiceInterface interface {
 	mock.TestingT
 	Cleanup(func())

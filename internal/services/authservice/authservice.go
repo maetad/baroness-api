@@ -57,8 +57,8 @@ func (s AuthService) GenerateToken(c Claimer, expiredIn time.Duration) (string, 
 		claims[k] = v
 	}
 
-	claims["iat"] = time.Now()
-	claims["nbf"] = time.Now()
+	claims["iat"] = time.Now().Unix()
+	claims["nbf"] = time.Now().Unix()
 	claims["exp"] = time.Now().Add(expiredIn).Unix()
 
 	token := jwt.NewWithClaims(s.signingMethod, claims)

@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/pakkaparn/no-idea-api/internal/config"
 	"github.com/pakkaparn/no-idea-api/internal/handlers"
 	"github.com/pakkaparn/no-idea-api/internal/services/authservice"
@@ -45,7 +46,7 @@ func TestNewAuthHandler(t *testing.T) {
 	}
 }
 
-func TestAuthHandler_LoginHandler(t *testing.T) {
+func TestAuthHandler_Login(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	type fields struct {
@@ -227,10 +228,104 @@ func TestAuthHandler_LoginHandler(t *testing.T) {
 				tt.fields.authservice,
 				tt.fields.userservice,
 			)
-			h.LoginHandler(tt.args.c)
+			h.Login(tt.args.c)
 
 			if tt.args.c.Writer.Status() != tt.want {
-				t.Errorf("LoginHandler() = %v, want %v", tt.args.c.Writer.Status(), tt.want)
+				t.Errorf("Login() = %v, want %v", tt.args.c.Writer.Status(), tt.want)
+			}
+		})
+	}
+}
+
+func TestAuthHandler_Authorize(t *testing.T) {
+	type fields struct {
+		log         *logrus.Entry
+		options     config.Options
+		authservice authservice.AuthServiceInterface
+		userservice userservice.UserServiceInterface
+	}
+	type args struct {
+		c *gin.Context
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   int
+	}{
+		{
+			name: "token invalid",
+			fields: func() fields {
+				authservice := &mocks.AuthServiceInterface{}
+
+				authservice.On("ParseToken", "jwttoken").
+					Return(nil, errors.New("cannot parse"))
+
+				f := fields{
+					log:         &logrus.Entry{},
+					authservice: authservice,
+				}
+
+				return f
+			}(),
+			args: func() args {
+				w := httptest.NewRecorder()
+				c, _ := gin.CreateTestContext(w)
+
+				c.Request = &http.Request{
+					URL:    &url.URL{},
+					Header: make(http.Header),
+				}
+
+				c.Request.Header.Set("Authorization", "Bearer jwttoken")
+
+				return args{c}
+			}(),
+			want: http.StatusUnauthorized,
+		},
+		{
+			name: "token valid",
+			fields: func() fields {
+				authservice := &mocks.AuthServiceInterface{}
+
+				authservice.On("ParseToken", "jwttoken").
+					Return(jwt.MapClaims{}, nil)
+
+				f := fields{
+					log:         &logrus.Entry{},
+					authservice: authservice,
+				}
+
+				return f
+			}(),
+			args: func() args {
+				w := httptest.NewRecorder()
+				c, _ := gin.CreateTestContext(w)
+
+				c.Request = &http.Request{
+					URL:    &url.URL{},
+					Header: make(http.Header),
+				}
+
+				c.Request.Header.Set("Authorization", "Bearer jwttoken")
+
+				return args{c}
+			}(),
+			want: http.StatusOK,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			h := handlers.NewAuthHandler(
+				tt.fields.log,
+				tt.fields.options,
+				tt.fields.authservice,
+				tt.fields.userservice,
+			)
+			h.Authorize(tt.args.c)
+
+			if tt.args.c.Writer.Status() != tt.want {
+				t.Errorf("Authorize() = %v, want %v", tt.args.c.Writer.Status(), tt.want)
 			}
 		})
 	}
