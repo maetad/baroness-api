@@ -13,4 +13,5 @@ type Event struct {
 	Channel  pq.StringArray `json:"channel" gorm:"type:event_channel[]"`
 	StartAt  time.Time      `json:"start_at"`
 	EndAt    time.Time      `json:"end_at"`
+	Author
 }

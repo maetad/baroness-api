@@ -12,3 +12,12 @@ type Model struct {
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
 }
+
+type Author struct {
+	CreatedBy uint `json:"-"`
+	UpdatedBy uint `json:"-"`
+	DeletedBy uint `json:"-"`
+	Creator   User `json:"creator" gorm:"foreignkey:CreatedBy"`
+	Updator   User `json:"updator" gorm:"foreignkey:UpdatedBy"`
+	Deletor   User `json:"deletor" gorm:"foreignkey:DeletedBy"`
+}

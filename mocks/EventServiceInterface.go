@@ -14,13 +14,13 @@ type EventServiceInterface struct {
 	mock.Mock
 }
 
-// Create provides a mock function with given fields: r
-func (_m *EventServiceInterface) Create(r eventservice.EventCreateRequest) (*model.Event, error) {
-	ret := _m.Called(r)
+// Create provides a mock function with given fields: r, creator
+func (_m *EventServiceInterface) Create(r eventservice.EventCreateRequest, creator *model.User) (*model.Event, error) {
+	ret := _m.Called(r, creator)
 
 	var r0 *model.Event
-	if rf, ok := ret.Get(0).(func(eventservice.EventCreateRequest) *model.Event); ok {
-		r0 = rf(r)
+	if rf, ok := ret.Get(0).(func(eventservice.EventCreateRequest, *model.User) *model.Event); ok {
+		r0 = rf(r, creator)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.Event)
@@ -28,8 +28,8 @@ func (_m *EventServiceInterface) Create(r eventservice.EventCreateRequest) (*mod
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(eventservice.EventCreateRequest) error); ok {
-		r1 = rf(r)
+	if rf, ok := ret.Get(1).(func(eventservice.EventCreateRequest, *model.User) error); ok {
+		r1 = rf(r, creator)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -37,13 +37,13 @@ func (_m *EventServiceInterface) Create(r eventservice.EventCreateRequest) (*mod
 	return r0, r1
 }
 
-// Delete provides a mock function with given fields: event
-func (_m *EventServiceInterface) Delete(event *model.Event) error {
-	ret := _m.Called(event)
+// Delete provides a mock function with given fields: event, deletor
+func (_m *EventServiceInterface) Delete(event *model.Event, deletor *model.User) error {
+	ret := _m.Called(event, deletor)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(*model.Event) error); ok {
-		r0 = rf(event)
+	if rf, ok := ret.Get(0).(func(*model.Event, *model.User) error); ok {
+		r0 = rf(event, deletor)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -97,13 +97,13 @@ func (_m *EventServiceInterface) List() ([]model.Event, error) {
 	return r0, r1
 }
 
-// Update provides a mock function with given fields: event, r
-func (_m *EventServiceInterface) Update(event *model.Event, r eventservice.EventUpdateRequest) (*model.Event, error) {
-	ret := _m.Called(event, r)
+// Update provides a mock function with given fields: event, r, updator
+func (_m *EventServiceInterface) Update(event *model.Event, r eventservice.EventUpdateRequest, updator *model.User) (*model.Event, error) {
+	ret := _m.Called(event, r, updator)
 
 	var r0 *model.Event
-	if rf, ok := ret.Get(0).(func(*model.Event, eventservice.EventUpdateRequest) *model.Event); ok {
-		r0 = rf(event, r)
+	if rf, ok := ret.Get(0).(func(*model.Event, eventservice.EventUpdateRequest, *model.User) *model.Event); ok {
+		r0 = rf(event, r, updator)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.Event)
@@ -111,8 +111,8 @@ func (_m *EventServiceInterface) Update(event *model.Event, r eventservice.Event
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(*model.Event, eventservice.EventUpdateRequest) error); ok {
-		r1 = rf(event, r)
+	if rf, ok := ret.Get(1).(func(*model.Event, eventservice.EventUpdateRequest, *model.User) error); ok {
+		r1 = rf(event, r, updator)
 	} else {
 		r1 = ret.Error(1)
 	}

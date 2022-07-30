@@ -4,7 +4,6 @@ import (
 	"errors"
 	"reflect"
 	"testing"
-	"time"
 
 	"github.com/maetad/baroness-api/internal/database"
 	"github.com/maetad/baroness-api/internal/model"
@@ -86,13 +85,12 @@ func TestEventService_List(t *testing.T) {
 }
 
 func TestEventService_Create(t *testing.T) {
-	var now = time.Now()
-
 	type fields struct {
 		db database.DatabaseInterface
 	}
 	type args struct {
-		r eventservice.EventCreateRequest
+		r       eventservice.EventCreateRequest
+		creator *model.User
 	}
 	tests := []struct {
 		name    string
@@ -117,16 +115,17 @@ func TestEventService_Create(t *testing.T) {
 					Name:     "event name",
 					Platform: []string{"platform 1", "platform 2"},
 					Channel:  []string{"channel 1", "channel 2"},
-					StartAt:  now,
-					EndAt:    now,
 				},
+				creator: &model.User{Model: model.Model{ID: 1}},
 			},
 			want: &model.Event{
 				Name:     "event name",
 				Platform: []string{"platform 1", "platform 2"},
 				Channel:  []string{"channel 1", "channel 2"},
-				StartAt:  now,
-				EndAt:    now,
+				Author: model.Author{
+					CreatedBy: 1,
+					UpdatedBy: 1,
+				},
 			},
 		},
 		{
@@ -145,9 +144,8 @@ func TestEventService_Create(t *testing.T) {
 					Name:     "event name",
 					Platform: []string{"platform 1", "platform 2"},
 					Channel:  []string{"channel 1", "channel 2"},
-					StartAt:  now,
-					EndAt:    now,
 				},
+				creator: &model.User{Model: model.Model{ID: 1}},
 			},
 			wantErr: true,
 		},
@@ -155,7 +153,7 @@ func TestEventService_Create(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := eventservice.New(tt.fields.db)
-			got, err := s.Create(tt.args.r)
+			got, err := s.Create(tt.args.r, tt.args.creator)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("EventService.Create() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -230,13 +228,13 @@ func TestEventService_Get(t *testing.T) {
 }
 
 func TestEventService_Update(t *testing.T) {
-	var now = time.Now()
 	type fields struct {
 		db database.DatabaseInterface
 	}
 	type args struct {
-		event *model.Event
-		r     eventservice.EventUpdateRequest
+		event   *model.Event
+		r       eventservice.EventUpdateRequest
+		updator *model.User
 	}
 	tests := []struct {
 		name    string
@@ -261,23 +259,21 @@ func TestEventService_Update(t *testing.T) {
 					Name:     "event name",
 					Platform: []string{"platform 1", "platform 2"},
 					Channel:  []string{"channel 1", "channel 2"},
-					StartAt:  now,
-					EndAt:    now,
 				},
 				r: eventservice.EventUpdateRequest{
 					Name:     "new event name",
 					Platform: []string{"platform 1", "platform 2"},
 					Channel:  []string{"channel 1", "channel 2"},
-					StartAt:  now,
-					EndAt:    now,
 				},
+				updator: &model.User{Model: model.Model{ID: 1}},
 			},
 			want: &model.Event{
 				Name:     "new event name",
 				Platform: []string{"platform 1", "platform 2"},
 				Channel:  []string{"channel 1", "channel 2"},
-				StartAt:  now,
-				EndAt:    now,
+				Author: model.Author{
+					UpdatedBy: 1,
+				},
 			},
 		},
 		{
@@ -292,8 +288,9 @@ func TestEventService_Update(t *testing.T) {
 				return fields{db}
 			}(),
 			args: args{
-				event: &model.Event{},
-				r:     eventservice.EventUpdateRequest{},
+				event:   &model.Event{},
+				r:       eventservice.EventUpdateRequest{},
+				updator: &model.User{Model: model.Model{ID: 1}},
 			},
 			wantErr: true,
 		},
@@ -301,7 +298,7 @@ func TestEventService_Update(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := eventservice.New(tt.fields.db)
-			got, err := s.Update(tt.args.event, tt.args.r)
+			got, err := s.Update(tt.args.event, tt.args.r, tt.args.updator)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("EventService.Update() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -318,7 +315,8 @@ func TestEventService_Delete(t *testing.T) {
 		db database.DatabaseInterface
 	}
 	type args struct {
-		event *model.Event
+		event   *model.Event
+		deletor *model.User
 	}
 	tests := []struct {
 		name    string
@@ -330,28 +328,30 @@ func TestEventService_Delete(t *testing.T) {
 			name: "delete success",
 			fields: func() fields {
 				db := &mocks.DatabaseInterface{}
-				db.On("Delete", mock.AnythingOfType("*model.Event")).
+				db.On("Save", mock.AnythingOfType("*model.Event")).
 					Return(&gorm.DB{
 						Error: nil,
 					})
 				return fields{db}
 			}(),
 			args: args{
-				event: &model.Event{},
+				event:   &model.Event{},
+				deletor: &model.User{Model: model.Model{ID: 1}},
 			},
 		},
 		{
 			name: "delete fail",
 			fields: func() fields {
 				db := &mocks.DatabaseInterface{}
-				db.On("Delete", mock.AnythingOfType("*model.Event")).
+				db.On("Save", mock.AnythingOfType("*model.Event")).
 					Return(&gorm.DB{
 						Error: errors.New("delete fail"),
 					})
 				return fields{db}
 			}(),
 			args: args{
-				event: &model.Event{},
+				event:   &model.Event{},
+				deletor: &model.User{Model: model.Model{ID: 1}},
 			},
 			wantErr: true,
 		},
@@ -359,7 +359,7 @@ func TestEventService_Delete(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := eventservice.New(tt.fields.db)
-			if err := s.Delete(tt.args.event); (err != nil) != tt.wantErr {
+			if err := s.Delete(tt.args.event, tt.args.deletor); (err != nil) != tt.wantErr {
 				t.Errorf("EventService.Delete() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
