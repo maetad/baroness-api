@@ -5,6 +5,7 @@
         "auth",
         "file",
         "event",
-        "workflow"
+        "workflow",
+        "state"
     ]
 }

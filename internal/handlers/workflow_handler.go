@@ -31,6 +31,28 @@ func (h *WorkflowHandler) List(c *gin.Context) {
 	c.JSON(http.StatusOK, list)
 }
 
+func (h *WorkflowHandler) Get(c *gin.Context) {
+	var (
+		id  int
+		err error
+	)
+
+	if id, err = strconv.Atoi(c.Param("workflow_id")); err != nil {
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
+
+	workflow, err := h.workflowservice.Get(uint(id))
+	if err != nil {
+		h.log.WithError(err).Errorf("Get(): h.workflowservice.Get error %v", err)
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
+
+	c.Set("workflow", workflow)
+	c.Next()
+}
+
 func (h *WorkflowHandler) Create(c *gin.Context) {
 	user := c.MustGet("user").(*model.User)
 	event := c.MustGet("event").(*model.Event)
@@ -53,23 +75,8 @@ func (h *WorkflowHandler) Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, workflow)
 }
 
-func (h *WorkflowHandler) Get(c *gin.Context) {
-	var (
-		id  int
-		err error
-	)
-
-	if id, err = strconv.Atoi(c.Param("workflow_id")); err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
-		return
-	}
-
-	workflow, err := h.workflowservice.Get(uint(id))
-	if err != nil {
-		h.log.WithError(err).Errorf("Get(): h.workflowservice.Get error %v", err)
-		c.AbortWithStatus(http.StatusNotFound)
-		return
-	}
+func (h *WorkflowHandler) Show(c *gin.Context) {
+	workflow := c.MustGet("workflow").(*model.Workflow)
 
 	c.JSON(http.StatusOK, workflow)
 }

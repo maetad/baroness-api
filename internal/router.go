@@ -56,9 +56,20 @@ func registerRouter(
 		{
 			workflowRoute.GET("/", workflowHandler.List)
 			workflowRoute.POST("/", workflowHandler.Create)
-			workflowRoute.GET("/:workflow_id", workflowHandler.Get)
-			workflowRoute.PUT("/:workflow_id", workflowHandler.Update)
-			workflowRoute.DELETE("/:workflow_id", workflowHandler.Delete)
+			workflowRoute.GET("/:workflow_id", workflowHandler.Get, workflowHandler.Show)
+			workflowRoute.PUT("/:workflow_id", workflowHandler.Get, workflowHandler.Update)
+			workflowRoute.DELETE("/:workflow_id", workflowHandler.Get, workflowHandler.Delete)
+		}
+
+		stateHandler := handlers.NewStateHandler(l, services.stateservice)
+		stateRoute := authorized.Group("/events/:event_id/workflows/:workflow_id")
+		stateRoute.Use(workflowHandler.Get)
+		{
+			stateRoute.GET("/", stateHandler.List)
+			stateRoute.POST("/", stateHandler.Create)
+			stateRoute.GET("/:state_id", stateHandler.Get, stateHandler.Show)
+			stateRoute.PUT("/:state_id", stateHandler.Get, stateHandler.Update)
+			stateRoute.DELETE("/:state_id", stateHandler.Get, stateHandler.Delete)
 		}
 	}
 }

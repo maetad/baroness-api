@@ -11,6 +11,7 @@ import (
 	"github.com/maetad/baroness-api/internal/services/eventservice"
 	"github.com/maetad/baroness-api/internal/services/fileservice"
 	"github.com/maetad/baroness-api/internal/services/fileservice/storageprovider"
+	"github.com/maetad/baroness-api/internal/services/stateservice"
 	"github.com/maetad/baroness-api/internal/services/userservice"
 	"github.com/maetad/baroness-api/internal/services/workflowservice"
 	"github.com/sirupsen/logrus"
@@ -29,6 +30,7 @@ type internalService struct {
 	fileservice     fileservice.FileServiceInterface
 	eventservice    eventservice.EventServiceInterface
 	workflowservice workflowservice.WorkflowServiceInterface
+	stateservice    stateservice.StateServiceInterface
 }
 
 func New(
@@ -68,6 +70,7 @@ func New(
 		fileservice:     storageprovider.NewProvider(options.StorageProvider, options.StorageConfig),
 		eventservice:    eventservice.New(db),
 		workflowservice: workflowservice.New(db),
+		stateservice:    stateservice.New(db),
 	}
 
 	registerRouter(r, l, options, services)

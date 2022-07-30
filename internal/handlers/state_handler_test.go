@@ -14,43 +14,43 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/maetad/baroness-api/internal/handlers"
 	"github.com/maetad/baroness-api/internal/model"
-	"github.com/maetad/baroness-api/internal/services/workflowservice"
+	"github.com/maetad/baroness-api/internal/services/stateservice"
 	"github.com/maetad/baroness-api/mocks"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/mock"
 )
 
-func TestNewWorkflowHandler(t *testing.T) {
+func TestNewStateHandler(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	type args struct {
-		log             *logrus.Entry
-		workflowservice workflowservice.WorkflowServiceInterface
+		log          *logrus.Entry
+		stateservice stateservice.StateServiceInterface
 	}
 	tests := []struct {
 		name string
 		args args
-		want *handlers.WorkflowHandler
+		want *handlers.StateHandler
 	}{
 		{
-			name: "create workflow handler",
+			name: "create state handler",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := handlers.NewWorkflowHandler(tt.args.log, tt.args.workflowservice); reflect.TypeOf(got) != reflect.TypeOf(&handlers.WorkflowHandler{}) {
-				t.Errorf("NewWorkflowHandler() = %v, want %v", got, tt.want)
+			if got := handlers.NewStateHandler(tt.args.log, tt.args.stateservice); reflect.TypeOf(got) != reflect.TypeOf(&handlers.StateHandler{}) {
+				t.Errorf("NewStateHandler() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestWorkflowHandler_List(t *testing.T) {
+func TestStateHandler_List(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	type fields struct {
-		log             *logrus.Entry
-		workflowservice workflowservice.WorkflowServiceInterface
+		log          *logrus.Entry
+		stateservice stateservice.StateServiceInterface
 	}
 	type args struct {
 		c *gin.Context
@@ -64,13 +64,13 @@ func TestWorkflowHandler_List(t *testing.T) {
 		{
 			name: "listed success",
 			fields: func() fields {
-				workflows := make([]model.Workflow, 1)
-				workflowservice := &mocks.WorkflowServiceInterface{}
-				workflowservice.On("List", mock.Anything).
-					Return(workflows, nil)
+				states := make([]model.State, 1)
+				stateservice := &mocks.StateServiceInterface{}
+				stateservice.On("List", mock.Anything).
+					Return(states, nil)
 				return fields{
-					log:             logrus.WithContext(context.TODO()),
-					workflowservice: workflowservice,
+					log:          logrus.WithContext(context.TODO()),
+					stateservice: stateservice,
 				}
 			}(),
 			args: func() args {
@@ -82,7 +82,7 @@ func TestWorkflowHandler_List(t *testing.T) {
 					Header: make(http.Header),
 				}
 
-				c.Set("event", &model.Event{})
+				c.Set("workflow", &model.Workflow{})
 
 				return args{c}
 			}(),
@@ -91,12 +91,12 @@ func TestWorkflowHandler_List(t *testing.T) {
 		{
 			name: "listed fail",
 			fields: func() fields {
-				workflowservice := &mocks.WorkflowServiceInterface{}
-				workflowservice.On("List", mock.Anything).
+				stateservice := &mocks.StateServiceInterface{}
+				stateservice.On("List", mock.Anything).
 					Return(nil, errors.New("list fail"))
 				return fields{
-					log:             logrus.WithContext(context.TODO()),
-					workflowservice: workflowservice,
+					log:          logrus.WithContext(context.TODO()),
+					stateservice: stateservice,
 				}
 			}(),
 			args: func() args {
@@ -108,7 +108,7 @@ func TestWorkflowHandler_List(t *testing.T) {
 					Header: make(http.Header),
 				}
 
-				c.Set("event", &model.Event{})
+				c.Set("workflow", &model.Workflow{})
 
 				return args{c}
 			}(),
@@ -117,7 +117,7 @@ func TestWorkflowHandler_List(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			h := handlers.NewWorkflowHandler(tt.fields.log, tt.fields.workflowservice)
+			h := handlers.NewStateHandler(tt.fields.log, tt.fields.stateservice)
 			h.List(tt.args.c)
 
 			if tt.args.c.Writer.Status() != tt.want {
@@ -127,12 +127,12 @@ func TestWorkflowHandler_List(t *testing.T) {
 	}
 }
 
-func TestWorkflowHandler_Create(t *testing.T) {
+func TestStateHandler_Create(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	type fields struct {
-		log             *logrus.Entry
-		workflowservice workflowservice.WorkflowServiceInterface
+		log          *logrus.Entry
+		stateservice stateservice.StateServiceInterface
 	}
 	type args struct {
 		c *gin.Context
@@ -144,15 +144,15 @@ func TestWorkflowHandler_Create(t *testing.T) {
 		want   int
 	}{
 		{
-			name: "workflow created success",
+			name: "state created success",
 			fields: func() fields {
-				u := &mocks.WorkflowServiceInterface{}
-				u.On("Create", workflowservice.WorkflowCreateRequest{
-					Name: "workflow name",
-				}, mock.Anything).Return(&model.Workflow{}, nil)
+				u := &mocks.StateServiceInterface{}
+				u.On("Create", stateservice.StateCreateRequest{
+					Name: "state name",
+				}, mock.Anything).Return(&model.State{}, nil)
 				return fields{
-					workflowservice: u,
-					log:             logrus.WithContext(context.TODO()),
+					stateservice: u,
+					log:          logrus.WithContext(context.TODO()),
 				}
 			}(),
 			args: func() args {
@@ -162,26 +162,26 @@ func TestWorkflowHandler_Create(t *testing.T) {
 				c.Request = &http.Request{
 					URL:    &url.URL{},
 					Header: make(http.Header),
-					Body:   io.NopCloser(strings.NewReader(`{"name":"workflow name","platform":["platform 1", "platform 2"],"channel":["channel 1", "channel 2"]}`)),
+					Body:   io.NopCloser(strings.NewReader(`{"name":"state name","platform":["platform 1", "platform 2"],"channel":["channel 1", "channel 2"]}`)),
 				}
 
 				c.Set("user", &model.User{})
-				c.Set("event", &model.Event{})
+				c.Set("workflow", &model.Workflow{})
 
 				return args{c}
 			}(),
 			want: http.StatusCreated,
 		},
 		{
-			name: "workflow created fail invalid payload",
+			name: "state created fail invalid payload",
 			fields: func() fields {
-				u := &mocks.WorkflowServiceInterface{}
-				u.On("Create", workflowservice.WorkflowCreateRequest{
-					Name: "workflow name",
-				}, mock.Anything).Return(&model.Workflow{}, nil)
+				u := &mocks.StateServiceInterface{}
+				u.On("Create", stateservice.StateCreateRequest{
+					Name: "state name",
+				}, mock.Anything).Return(&model.State{}, nil)
 				return fields{
-					workflowservice: u,
-					log:             logrus.WithContext(context.TODO()),
+					stateservice: u,
+					log:          logrus.WithContext(context.TODO()),
 				}
 			}(),
 			args: func() args {
@@ -195,22 +195,22 @@ func TestWorkflowHandler_Create(t *testing.T) {
 				}
 
 				c.Set("user", &model.User{})
-				c.Set("event", &model.Event{})
+				c.Set("workflow", &model.Workflow{})
 
 				return args{c}
 			}(),
 			want: http.StatusUnprocessableEntity,
 		},
 		{
-			name: "workflow created fail",
+			name: "state created fail",
 			fields: func() fields {
-				u := &mocks.WorkflowServiceInterface{}
-				u.On("Create", workflowservice.WorkflowCreateRequest{
-					Name: "workflow name",
+				u := &mocks.StateServiceInterface{}
+				u.On("Create", stateservice.StateCreateRequest{
+					Name: "state name",
 				}, mock.Anything).Return(nil, errors.New("create error"))
 				return fields{
-					workflowservice: u,
-					log:             logrus.WithContext(context.TODO()),
+					stateservice: u,
+					log:          logrus.WithContext(context.TODO()),
 				}
 			}(),
 			args: func() args {
@@ -220,11 +220,11 @@ func TestWorkflowHandler_Create(t *testing.T) {
 				c.Request = &http.Request{
 					URL:    &url.URL{},
 					Header: make(http.Header),
-					Body:   io.NopCloser(strings.NewReader(`{"name":"workflow name","platform":["platform 1", "platform 2"],"channel":["channel 1", "channel 2"]}`)),
+					Body:   io.NopCloser(strings.NewReader(`{"name":"state name","platform":["platform 1", "platform 2"],"channel":["channel 1", "channel 2"]}`)),
 				}
 
 				c.Set("user", &model.User{})
-				c.Set("event", &model.Event{})
+				c.Set("workflow", &model.Workflow{})
 
 				return args{c}
 			}(),
@@ -233,7 +233,7 @@ func TestWorkflowHandler_Create(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			h := handlers.NewWorkflowHandler(tt.fields.log, tt.fields.workflowservice)
+			h := handlers.NewStateHandler(tt.fields.log, tt.fields.stateservice)
 			h.Create(tt.args.c)
 
 			if tt.args.c.Writer.Status() != tt.want {
@@ -243,10 +243,10 @@ func TestWorkflowHandler_Create(t *testing.T) {
 	}
 }
 
-func TestWorkflowHandler_Get(t *testing.T) {
+func TestStateHandler_Get(t *testing.T) {
 	type fields struct {
-		log             *logrus.Entry
-		workflowservice workflowservice.WorkflowServiceInterface
+		log          *logrus.Entry
+		stateservice stateservice.StateServiceInterface
 	}
 	type args struct {
 		c *gin.Context
@@ -258,15 +258,15 @@ func TestWorkflowHandler_Get(t *testing.T) {
 		want   int
 	}{
 		{
-			name: "workflow found",
+			name: "state found",
 			fields: func() fields {
-				workflow := &model.Workflow{}
-				workflowservice := &mocks.WorkflowServiceInterface{}
-				workflowservice.On("Get", uint(1)).
-					Return(workflow, nil)
+				state := &model.State{}
+				stateservice := &mocks.StateServiceInterface{}
+				stateservice.On("Get", uint(1)).
+					Return(state, nil)
 				return fields{
-					log:             logrus.WithContext(context.TODO()),
-					workflowservice: workflowservice,
+					log:          logrus.WithContext(context.TODO()),
+					stateservice: stateservice,
 				}
 			}(),
 			args: func() args {
@@ -280,27 +280,27 @@ func TestWorkflowHandler_Get(t *testing.T) {
 
 				c.Params = gin.Params{
 					{
-						Key:   "workflow_id",
+						Key:   "state_id",
 						Value: "1",
 					},
 				}
 
 				c.Set("user", &model.User{})
-				c.Set("event", &model.Event{})
+				c.Set("workflow", &model.Workflow{})
 
 				return args{c}
 			}(),
 			want: http.StatusOK,
 		},
 		{
-			name: "workflow not found",
+			name: "state not found",
 			fields: func() fields {
-				workflowservice := &mocks.WorkflowServiceInterface{}
-				workflowservice.On("Get", uint(1)).
-					Return(nil, errors.New("workflow not found"))
+				stateservice := &mocks.StateServiceInterface{}
+				stateservice.On("Get", uint(1)).
+					Return(nil, errors.New("state not found"))
 				return fields{
-					log:             logrus.WithContext(context.TODO()),
-					workflowservice: workflowservice,
+					log:          logrus.WithContext(context.TODO()),
+					stateservice: stateservice,
 				}
 			}(),
 			args: func() args {
@@ -314,13 +314,13 @@ func TestWorkflowHandler_Get(t *testing.T) {
 
 				c.Params = gin.Params{
 					{
-						Key:   "workflow_id",
+						Key:   "state_id",
 						Value: "1",
 					},
 				}
 
 				c.Set("user", &model.User{})
-				c.Set("event", &model.Event{})
+				c.Set("workflow", &model.Workflow{})
 
 				return args{c}
 			}(),
@@ -339,13 +339,13 @@ func TestWorkflowHandler_Get(t *testing.T) {
 
 				c.Params = gin.Params{
 					{
-						Key:   "workflow_id",
+						Key:   "state_id",
 						Value: "one",
 					},
 				}
 
 				c.Set("user", &model.User{})
-				c.Set("event", &model.Event{})
+				c.Set("workflow", &model.Workflow{})
 
 				return args{c}
 			}(),
@@ -354,9 +354,9 @@ func TestWorkflowHandler_Get(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			h := handlers.NewWorkflowHandler(
+			h := handlers.NewStateHandler(
 				tt.fields.log,
-				tt.fields.workflowservice,
+				tt.fields.stateservice,
 			)
 			h.Get(tt.args.c)
 
@@ -367,10 +367,10 @@ func TestWorkflowHandler_Get(t *testing.T) {
 	}
 }
 
-func TestWorkflowHandler_Update(t *testing.T) {
+func TestStateHandler_Update(t *testing.T) {
 	type fields struct {
-		log             *logrus.Entry
-		workflowservice workflowservice.WorkflowServiceInterface
+		log          *logrus.Entry
+		stateservice stateservice.StateServiceInterface
 	}
 	type args struct {
 		c *gin.Context
@@ -382,27 +382,27 @@ func TestWorkflowHandler_Update(t *testing.T) {
 		want   int
 	}{
 		{
-			name: "workflow update success",
+			name: "state update success",
 			fields: func() fields {
-				workflow := &model.Workflow{}
-				u := &mocks.WorkflowServiceInterface{}
+				state := &model.State{}
+				u := &mocks.StateServiceInterface{}
 
-				u.On("Get", uint(1)).Return(workflow, nil)
+				u.On("Get", uint(1)).Return(state, nil)
 
 				u.On(
 					"Update",
-					workflow,
-					workflowservice.WorkflowUpdateRequest{
-						Name: "new workflow name",
+					state,
+					stateservice.StateUpdateRequest{
+						Name: "new state name",
 					},
 					mock.Anything,
-				).Return(&model.Workflow{
-					Name: "new workflow name",
+				).Return(&model.State{
+					Name: "new state name",
 				}, nil)
 
 				return fields{
-					log:             logrus.WithContext(context.TODO()),
-					workflowservice: u,
+					log:          logrus.WithContext(context.TODO()),
+					stateservice: u,
 				}
 			}(),
 			args: func() args {
@@ -412,32 +412,32 @@ func TestWorkflowHandler_Update(t *testing.T) {
 				c.Request = &http.Request{
 					URL:    &url.URL{},
 					Header: make(http.Header),
-					Body:   io.NopCloser(strings.NewReader(`{"name":"new workflow name","platform":["platform 1","platform 2"],"channel":["channel 1", "channel 2"]}`)),
+					Body:   io.NopCloser(strings.NewReader(`{"name":"new state name","platform":["platform 1","platform 2"],"channel":["channel 1", "channel 2"]}`)),
 				}
 
 				c.Params = gin.Params{
 					{
-						Key:   "workflow_id",
+						Key:   "state_id",
 						Value: "1",
 					},
 				}
 
 				c.Set("user", &model.User{})
-				c.Set("event", &model.Event{})
+				c.Set("workflow", &model.Workflow{})
 
 				return args{c}
 			}(),
 			want: http.StatusOK,
 		},
 		{
-			name: "workflow not found",
+			name: "state not found",
 			fields: func() fields {
-				u := &mocks.WorkflowServiceInterface{}
-				u.On("Get", uint(1)).Return(nil, errors.New("workflow not found"))
+				u := &mocks.StateServiceInterface{}
+				u.On("Get", uint(1)).Return(nil, errors.New("state not found"))
 
 				return fields{
-					log:             logrus.WithContext(context.TODO()),
-					workflowservice: u,
+					log:          logrus.WithContext(context.TODO()),
+					stateservice: u,
 				}
 			}(),
 			args: func() args {
@@ -447,18 +447,18 @@ func TestWorkflowHandler_Update(t *testing.T) {
 				c.Request = &http.Request{
 					URL:    &url.URL{},
 					Header: make(http.Header),
-					Body:   io.NopCloser(strings.NewReader(`{"name":"new workflow name"}`)),
+					Body:   io.NopCloser(strings.NewReader(`{"name":"new state name"}`)),
 				}
 
 				c.Params = gin.Params{
 					{
-						Key:   "workflow_id",
+						Key:   "state_id",
 						Value: "1",
 					},
 				}
 
 				c.Set("user", &model.User{})
-				c.Set("event", &model.Event{})
+				c.Set("workflow", &model.Workflow{})
 
 				return args{c}
 			}(),
@@ -478,38 +478,38 @@ func TestWorkflowHandler_Update(t *testing.T) {
 
 				c.Params = gin.Params{
 					{
-						Key:   "workflow_id",
+						Key:   "state_id",
 						Value: "1",
 					},
 				}
 
 				c.Set("user", &model.User{})
-				c.Set("event", &model.Event{})
+				c.Set("workflow", &model.Workflow{})
 
 				return args{c}
 			}(),
 			want: http.StatusUnprocessableEntity,
 		},
 		{
-			name: "workflow update fail",
+			name: "state update fail",
 			fields: func() fields {
-				workflow := &model.Workflow{}
-				u := &mocks.WorkflowServiceInterface{}
+				state := &model.State{}
+				u := &mocks.StateServiceInterface{}
 
-				u.On("Get", uint(1)).Return(workflow, nil)
+				u.On("Get", uint(1)).Return(state, nil)
 
 				u.On(
 					"Update",
-					workflow,
-					workflowservice.WorkflowUpdateRequest{
-						Name: "new workflow name",
+					state,
+					stateservice.StateUpdateRequest{
+						Name: "new state name",
 					},
 					mock.Anything,
 				).Return(nil, errors.New("update fail"))
 
 				return fields{
-					log:             logrus.WithContext(context.TODO()),
-					workflowservice: u,
+					log:          logrus.WithContext(context.TODO()),
+					stateservice: u,
 				}
 			}(),
 			args: func() args {
@@ -519,25 +519,25 @@ func TestWorkflowHandler_Update(t *testing.T) {
 				c.Request = &http.Request{
 					URL:    &url.URL{},
 					Header: make(http.Header),
-					Body:   io.NopCloser(strings.NewReader(`{"name":"new workflow name","platform":["platform 1","platform 2"],"channel":["channel 1", "channel 2"]}`)),
+					Body:   io.NopCloser(strings.NewReader(`{"name":"new state name","platform":["platform 1","platform 2"],"channel":["channel 1", "channel 2"]}`)),
 				}
 
 				c.Params = gin.Params{
 					{
-						Key:   "workflow_id",
+						Key:   "state_id",
 						Value: "1",
 					},
 				}
 
 				c.Set("user", &model.User{})
-				c.Set("event", &model.Event{})
+				c.Set("workflow", &model.Workflow{})
 
 				return args{c}
 			}(),
 			want: http.StatusInternalServerError,
 		},
 		{
-			name: "workflow id invalid",
+			name: "state id invalid",
 			args: func() args {
 				w := httptest.NewRecorder()
 				c, _ := gin.CreateTestContext(w)
@@ -545,18 +545,18 @@ func TestWorkflowHandler_Update(t *testing.T) {
 				c.Request = &http.Request{
 					URL:    &url.URL{},
 					Header: make(http.Header),
-					Body:   io.NopCloser(strings.NewReader(`{"name":"new workflow name"}`)),
+					Body:   io.NopCloser(strings.NewReader(`{"name":"new state name"}`)),
 				}
 
 				c.Params = gin.Params{
 					{
-						Key:   "workflow_id",
+						Key:   "state_id",
 						Value: "one",
 					},
 				}
 
 				c.Set("user", &model.User{})
-				c.Set("event", &model.Event{})
+				c.Set("workflow", &model.Workflow{})
 
 				return args{c}
 			}(),
@@ -565,9 +565,9 @@ func TestWorkflowHandler_Update(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			h := handlers.NewWorkflowHandler(
+			h := handlers.NewStateHandler(
 				tt.fields.log,
-				tt.fields.workflowservice,
+				tt.fields.stateservice,
 			)
 			h.Update(tt.args.c)
 
@@ -578,10 +578,10 @@ func TestWorkflowHandler_Update(t *testing.T) {
 	}
 }
 
-func TestWorkflowHandler_Delete(t *testing.T) {
+func TestStateHandler_Delete(t *testing.T) {
 	type fields struct {
-		log             *logrus.Entry
-		workflowservice workflowservice.WorkflowServiceInterface
+		log          *logrus.Entry
+		stateservice stateservice.StateServiceInterface
 	}
 	type args struct {
 		c *gin.Context
@@ -593,17 +593,17 @@ func TestWorkflowHandler_Delete(t *testing.T) {
 		want   int
 	}{
 		{
-			name: "workflow delete success",
+			name: "state delete success",
 			fields: func() fields {
-				workflow := &model.Workflow{}
-				u := &mocks.WorkflowServiceInterface{}
+				state := &model.State{}
+				u := &mocks.StateServiceInterface{}
 
-				u.On("Get", uint(1)).Return(workflow, nil)
-				u.On("Delete", workflow, mock.Anything).Return(nil)
+				u.On("Get", uint(1)).Return(state, nil)
+				u.On("Delete", state, mock.Anything).Return(nil)
 
 				return fields{
-					log:             logrus.WithContext(context.TODO()),
-					workflowservice: u,
+					log:          logrus.WithContext(context.TODO()),
+					stateservice: u,
 				}
 			}(),
 			args: func() args {
@@ -617,7 +617,7 @@ func TestWorkflowHandler_Delete(t *testing.T) {
 
 				c.Params = gin.Params{
 					{
-						Key:   "workflow_id",
+						Key:   "state_id",
 						Value: "1",
 					},
 				}
@@ -629,14 +629,14 @@ func TestWorkflowHandler_Delete(t *testing.T) {
 			want: http.StatusNoContent,
 		},
 		{
-			name: "workflow not found",
+			name: "state not found",
 			fields: func() fields {
-				u := &mocks.WorkflowServiceInterface{}
-				u.On("Get", uint(1)).Return(nil, errors.New("workflow not found"))
+				u := &mocks.StateServiceInterface{}
+				u.On("Get", uint(1)).Return(nil, errors.New("state not found"))
 
 				return fields{
-					log:             logrus.WithContext(context.TODO()),
-					workflowservice: u,
+					log:          logrus.WithContext(context.TODO()),
+					stateservice: u,
 				}
 			}(),
 			args: func() args {
@@ -650,7 +650,7 @@ func TestWorkflowHandler_Delete(t *testing.T) {
 
 				c.Params = gin.Params{
 					{
-						Key:   "workflow_id",
+						Key:   "state_id",
 						Value: "1",
 					},
 				}
@@ -662,7 +662,7 @@ func TestWorkflowHandler_Delete(t *testing.T) {
 			want: http.StatusNotFound,
 		},
 		{
-			name: "workflow id invalid",
+			name: "state id invalid",
 			args: func() args {
 				w := httptest.NewRecorder()
 				c, _ := gin.CreateTestContext(w)
@@ -674,7 +674,7 @@ func TestWorkflowHandler_Delete(t *testing.T) {
 
 				c.Params = gin.Params{
 					{
-						Key:   "workflow_id",
+						Key:   "state_id",
 						Value: "one",
 					},
 				}
@@ -686,17 +686,17 @@ func TestWorkflowHandler_Delete(t *testing.T) {
 			want: http.StatusNotFound,
 		},
 		{
-			name: "workflow delete fail",
+			name: "state delete fail",
 			fields: func() fields {
-				workflow := &model.Workflow{}
-				u := &mocks.WorkflowServiceInterface{}
+				state := &model.State{}
+				u := &mocks.StateServiceInterface{}
 
-				u.On("Get", uint(1)).Return(workflow, nil)
-				u.On("Delete", workflow, mock.Anything).Return(errors.New("delete fail"))
+				u.On("Get", uint(1)).Return(state, nil)
+				u.On("Delete", state, mock.Anything).Return(errors.New("delete fail"))
 
 				return fields{
-					log:             logrus.WithContext(context.TODO()),
-					workflowservice: u,
+					log:          logrus.WithContext(context.TODO()),
+					stateservice: u,
 				}
 			}(),
 			args: func() args {
@@ -710,7 +710,7 @@ func TestWorkflowHandler_Delete(t *testing.T) {
 
 				c.Params = gin.Params{
 					{
-						Key:   "workflow_id",
+						Key:   "state_id",
 						Value: "1",
 					},
 				}
@@ -724,9 +724,9 @@ func TestWorkflowHandler_Delete(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			h := handlers.NewWorkflowHandler(
+			h := handlers.NewStateHandler(
 				tt.fields.log,
-				tt.fields.workflowservice,
+				tt.fields.stateservice,
 			)
 			h.Delete(tt.args.c)
 
@@ -737,10 +737,10 @@ func TestWorkflowHandler_Delete(t *testing.T) {
 	}
 }
 
-func TestWorkflowHandler_Show(t *testing.T) {
+func TestStateHandler_Show(t *testing.T) {
 	type fields struct {
-		log             *logrus.Entry
-		workflowservice workflowservice.WorkflowServiceInterface
+		log          *logrus.Entry
+		stateservice stateservice.StateServiceInterface
 	}
 	type args struct {
 		c *gin.Context
@@ -753,7 +753,7 @@ func TestWorkflowHandler_Show(t *testing.T) {
 	}{
 
 		{
-			name: "workflow show success",
+			name: "state show success",
 			args: func() args {
 				w := httptest.NewRecorder()
 				c, _ := gin.CreateTestContext(w)
@@ -763,7 +763,7 @@ func TestWorkflowHandler_Show(t *testing.T) {
 					Header: make(http.Header),
 				}
 
-				c.Set("workflow", &model.Workflow{})
+				c.Set("state", &model.State{})
 
 				return args{c}
 			}(),
@@ -772,7 +772,7 @@ func TestWorkflowHandler_Show(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			h := handlers.NewWorkflowHandler(tt.fields.log, tt.fields.workflowservice)
+			h := handlers.NewStateHandler(tt.fields.log, tt.fields.stateservice)
 			h.Show(tt.args.c)
 
 			if tt.args.c.Writer.Status() != tt.want {
