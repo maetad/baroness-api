@@ -13,15 +13,15 @@ type UserServiceInterface struct {
 }
 
 // Create provides a mock function with given fields: r
-func (_m *UserServiceInterface) Create(r userservice.UserCreateRequest) (*userservice.User, error) {
+func (_m *UserServiceInterface) Create(r userservice.UserCreateRequest) (userservice.UserInterface, error) {
 	ret := _m.Called(r)
 
-	var r0 *userservice.User
-	if rf, ok := ret.Get(0).(func(userservice.UserCreateRequest) *userservice.User); ok {
+	var r0 userservice.UserInterface
+	if rf, ok := ret.Get(0).(func(userservice.UserCreateRequest) userservice.UserInterface); ok {
 		r0 = rf(r)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*userservice.User)
+			r0 = ret.Get(0).(userservice.UserInterface)
 		}
 	}
 
@@ -36,15 +36,15 @@ func (_m *UserServiceInterface) Create(r userservice.UserCreateRequest) (*userse
 }
 
 // GetByUsername provides a mock function with given fields: username
-func (_m *UserServiceInterface) GetByUsername(username string) (*userservice.User, error) {
+func (_m *UserServiceInterface) GetByUsername(username string) (userservice.UserInterface, error) {
 	ret := _m.Called(username)
 
-	var r0 *userservice.User
-	if rf, ok := ret.Get(0).(func(string) *userservice.User); ok {
+	var r0 userservice.UserInterface
+	if rf, ok := ret.Get(0).(func(string) userservice.UserInterface); ok {
 		r0 = rf(username)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*userservice.User)
+			r0 = ret.Get(0).(userservice.UserInterface)
 		}
 	}
 

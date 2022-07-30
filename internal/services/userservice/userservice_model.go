@@ -5,6 +5,11 @@ import (
 	"gorm.io/gorm"
 )
 
+type UserInterface interface {
+	SetPassword(password string)
+	ValidatePassword(password string) error
+}
+
 type User struct {
 	gorm.Model
 	Username    string

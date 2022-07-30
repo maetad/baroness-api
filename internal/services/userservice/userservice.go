@@ -12,8 +12,8 @@ type UserService struct {
 }
 
 type UserServiceInterface interface {
-	Create(r UserCreateRequest) (*User, error)
-	GetByUsername(username string) (*User, error)
+	Create(r UserCreateRequest) (UserInterface, error)
+	GetByUsername(username string) (UserInterface, error)
 }
 
 func New(db UserServiceDatabaseInterface) UserService {
