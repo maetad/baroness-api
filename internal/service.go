@@ -3,7 +3,6 @@ package internal
 import (
 	"context"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pakkaparn/no-idea-api/internal/config"
@@ -13,7 +12,6 @@ import (
 )
 
 var log *logrus.Entry
-var timeout = 10 * time.Second
 
 type Service struct {
 	Http *http.Server
