@@ -12,6 +12,7 @@ import (
 	"github.com/maetad/baroness-api/internal/services/fileservice"
 	"github.com/maetad/baroness-api/internal/services/fileservice/storageprovider"
 	"github.com/maetad/baroness-api/internal/services/stateservice"
+	"github.com/maetad/baroness-api/internal/services/transitionservice"
 	"github.com/maetad/baroness-api/internal/services/userservice"
 	"github.com/maetad/baroness-api/internal/services/workflowservice"
 	"github.com/sirupsen/logrus"
@@ -25,12 +26,13 @@ type Service struct {
 }
 
 type internalService struct {
-	authservice     authservice.AuthServiceInterface
-	userservice     userservice.UserServiceInterface
-	fileservice     fileservice.FileServiceInterface
-	eventservice    eventservice.EventServiceInterface
-	workflowservice workflowservice.WorkflowServiceInterface
-	stateservice    stateservice.StateServiceInterface
+	authservice       authservice.AuthServiceInterface
+	userservice       userservice.UserServiceInterface
+	fileservice       fileservice.FileServiceInterface
+	eventservice      eventservice.EventServiceInterface
+	workflowservice   workflowservice.WorkflowServiceInterface
+	stateservice      stateservice.StateServiceInterface
+	transitionservice transitionservice.TransitionServiceInterface
 }
 
 func New(
@@ -65,12 +67,13 @@ func New(
 	}
 
 	services := internalService{
-		authservice:     authservice.New(options.JWTSigningMethod, options.JWTSigningKey, options.JWTAllowMethod),
-		userservice:     userservice.New(db),
-		fileservice:     storageprovider.NewProvider(options.StorageProvider, options.StorageConfig),
-		eventservice:    eventservice.New(db),
-		workflowservice: workflowservice.New(db),
-		stateservice:    stateservice.New(db),
+		authservice:       authservice.New(options.JWTSigningMethod, options.JWTSigningKey, options.JWTAllowMethod),
+		userservice:       userservice.New(db),
+		fileservice:       storageprovider.NewProvider(options.StorageProvider, options.StorageConfig),
+		eventservice:      eventservice.New(db),
+		workflowservice:   workflowservice.New(db),
+		stateservice:      stateservice.New(db),
+		transitionservice: transitionservice.New(db),
 	}
 
 	registerRouter(r, l, options, services)
