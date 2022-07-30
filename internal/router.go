@@ -32,5 +32,6 @@ func registerRouter(
 		userRoute.GET("/", userHandler.List)
 		userRoute.POST("/", userHandler.Create)
 		userRoute.GET("/:id", userHandler.Get)
+		userRoute.PUT("/:id", userHandler.Update)
 	}
 }

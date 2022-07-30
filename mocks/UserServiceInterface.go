@@ -104,6 +104,29 @@ func (_m *UserServiceInterface) List() ([]userservice.UserInterface, error) {
 	return r0, r1
 }
 
+// Update provides a mock function with given fields: user, r
+func (_m *UserServiceInterface) Update(user userservice.UserInterface, r userservice.UserUpdateRequest) (userservice.UserInterface, error) {
+	ret := _m.Called(user, r)
+
+	var r0 userservice.UserInterface
+	if rf, ok := ret.Get(0).(func(userservice.UserInterface, userservice.UserUpdateRequest) userservice.UserInterface); ok {
+		r0 = rf(user, r)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(userservice.UserInterface)
+		}
+	}
+
+	var r1 error
+			if rf, ok := ret.Get(1).(func(userservice.UserInterface, userservice.UserUpdateRequest) error); ok {
+		r1 = rf(user, r)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type mockConstructorTestingTNewUserServiceInterface interface {
 	mock.TestingT
 	Cleanup(func())

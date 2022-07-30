@@ -6,6 +6,7 @@ type UserServiceDatabaseInterface interface {
 	Create(value interface{}) (tx *gorm.DB)
 	First(dest interface{}, conds ...interface{}) (tx *gorm.DB)
 	Find(dest interface{}, conds ...interface{}) (tx *gorm.DB)
+	Save(value interface{}) (tx *gorm.DB)
 }
 
 type UserService struct {
@@ -17,6 +18,7 @@ type UserServiceInterface interface {
 	Create(r UserCreateRequest) (UserInterface, error)
 	Get(id uint) (UserInterface, error)
 	GetByUsername(username string) (UserInterface, error)
+	Update(user UserInterface, r UserUpdateRequest) (UserInterface, error)
 }
 
 func New(db UserServiceDatabaseInterface) UserServiceInterface {
@@ -73,4 +75,18 @@ func (s UserService) GetByUsername(username string) (UserInterface, error) {
 	}
 
 	return user, nil
+}
+
+func (s UserService) Update(user UserInterface, r UserUpdateRequest) (UserInterface, error) {
+	u := user.(*User)
+	u.DisplayName = r.DisplayName
+	if r.Password != "" {
+		u.SetPassword(r.Password)
+	}
+
+	if result := s.db.Save(u); result.Error != nil {
+		return nil, result.Error
+	}
+
+	return u, nil
 }

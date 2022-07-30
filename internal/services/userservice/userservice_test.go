@@ -302,3 +302,117 @@ func TestUserService_Get(t *testing.T) {
 		})
 	}
 }
+
+func TestUserService_Update(t *testing.T) {
+	type fields struct {
+		db userservice.UserServiceDatabaseInterface
+	}
+	type args struct {
+		user userservice.UserInterface
+		r    userservice.UserUpdateRequest
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    userservice.UserInterface
+		wantErr bool
+	}{
+		{
+			name: "update with password",
+			fields: func() fields {
+				db := &mocks.UserServiceDatabaseInterface{}
+				db.On("Save", mock.AnythingOfType("*userservice.User")).
+					Return(&gorm.DB{
+						Error: nil,
+					})
+				return fields{db}
+			}(),
+			args: args{
+				user: &userservice.User{
+					DisplayName: "old",
+					Password:    "old",
+				},
+				r: userservice.UserUpdateRequest{
+					DisplayName: "new",
+					Password:    "password",
+				},
+			},
+			want: &userservice.User{
+				DisplayName: "new",
+				Password:    "$2a$10$EIbuP5hbywq0xp183mHeBe0cN6TO00FNK7sAZJGKXWr9V6A2pVLkS",
+			},
+		},
+		{
+			name: "update with out password",
+			fields: func() fields {
+				db := &mocks.UserServiceDatabaseInterface{}
+				db.On("Save", mock.AnythingOfType("*userservice.User")).
+					Return(&gorm.DB{
+						Error: nil,
+					})
+				return fields{db}
+			}(),
+			args: args{
+				user: &userservice.User{
+					DisplayName: "old",
+					Password:    "$2a$10$EIbuP5hbywq0xp183mHeBe0cN6TO00FNK7sAZJGKXWr9V6A2pVLkS",
+				},
+				r: userservice.UserUpdateRequest{
+					DisplayName: "new",
+				},
+			},
+			want: &userservice.User{
+				DisplayName: "new",
+				Password:    "$2a$10$EIbuP5hbywq0xp183mHeBe0cN6TO00FNK7sAZJGKXWr9V6A2pVLkS",
+			},
+		},
+		{
+			name: "update error",
+			fields: func() fields {
+				db := &mocks.UserServiceDatabaseInterface{}
+				db.On("Save", mock.AnythingOfType("*userservice.User")).
+					Return(&gorm.DB{
+						Error: errors.New("update error"),
+					})
+				return fields{db}
+			}(),
+			args: args{
+				user: &userservice.User{},
+				r:    userservice.UserUpdateRequest{},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := userservice.New(tt.fields.db)
+			got, err := s.Update(tt.args.user, tt.args.r)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("UserService.Update() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+
+			if tt.want != nil {
+				user := got.(*userservice.User)
+
+				if tt.args.r.Password != "" {
+					if err := got.ValidatePassword(tt.args.r.Password); err != nil {
+						t.Errorf("UserService.Update() password hashed invalid %v", err)
+					}
+				}
+
+				// ignore password difference
+				user.Password = ""
+				clone := tt.want
+				clone.(*userservice.User).Password = ""
+
+				if !reflect.DeepEqual(user, clone) {
+					t.Errorf("UserService.Update() = %v, want %v", user, tt.want)
+				}
+			} else if got != nil {
+				t.Errorf("UserService.Update() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
