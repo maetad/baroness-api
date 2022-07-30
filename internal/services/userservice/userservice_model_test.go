@@ -1,9 +1,11 @@
 package userservice_test
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/pakkaparn/no-idea-api/internal/services/userservice"
+	"gorm.io/gorm"
 )
 
 func TestUser_SetPassword(t *testing.T) {
@@ -83,6 +85,45 @@ func TestUser_ValidatePassword(t *testing.T) {
 			}
 			if err := u.ValidatePassword(tt.args.password); (err != nil) != tt.wantErr {
 				t.Errorf("User.ValidatePassword() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestUser_GetClaims(t *testing.T) {
+	type fields struct {
+		Model       gorm.Model
+		Username    string
+		Password    string
+		DisplayName string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   map[string]interface{}
+	}{
+		{
+			name: "user claims",
+			fields: fields{
+				Username:    "admin",
+				DisplayName: "Administrator",
+			},
+			want: map[string]interface{}{
+				"username":     "admin",
+				"display_name": "Administrator",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			u := &userservice.User{
+				Model:       tt.fields.Model,
+				Username:    tt.fields.Username,
+				Password:    tt.fields.Password,
+				DisplayName: tt.fields.DisplayName,
+			}
+			if got := u.GetClaims(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("User.GetClaims() = %v, want %v", got, tt.want)
 			}
 		})
 	}
