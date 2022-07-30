@@ -1,7 +1,5 @@
 package model
 
-import "github.com/lib/pq"
-
 type FieldType string
 
 const (
@@ -16,10 +14,9 @@ const (
 
 type Field struct {
 	Model
-	WorkflowID uint           `json:"workflow_id"`
-	Workflow   Workflow       `json:"workflow" gorm:"foreignkey:WorkflowID"`
-	Name       string         `json:"name"`
-	Type       FieldType      `json:"type"`
-	Options    pq.StringArray `json:"options"`
+	WorkflowID uint      `json:"workflow_id"`
+	Workflow   Workflow  `json:"workflow" gorm:"foreignkey:WorkflowID"`
+	Name       string    `json:"name"`
+	Type       FieldType `json:"type"`
 	Author
 }

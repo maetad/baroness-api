@@ -14,7 +14,6 @@ CREATE TABLE IF NOT EXISTS "public"."fields" (
   "workflow_id" integer NOT NULL REFERENCES "public"."workflows"("id"),
   "name" text NOT NULL,
   "type" field_type NOT NULL,
-  "options" text[] NULL,
   "created_by" integer NOT NULL REFERENCES "public"."users"("id"),
   "updated_by" integer NOT NULL REFERENCES "public"."users"("id"),
   "deleted_by" integer NULL REFERENCES "public"."users"("id"),
