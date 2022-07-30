@@ -21,4 +21,9 @@ type Options struct {
 	JWTSigningKey     []byte
 	JWTAllowMethod    authservice.AllowSigningMethod
 	JWTExpiredIn      time.Duration
+	GCSProjectID      string
+	GCSBucket         string
+	GoogleAccessID    string
+	GoogleCredential  string
+	GooglePrivateKey  []byte
 }
