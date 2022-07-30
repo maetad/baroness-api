@@ -21,6 +21,7 @@ services:
       - JWT_SIGNING_METHOD=HS256
       - JWT_SIGNING_KEY=mykey
       - JWT_ALLOW_METHOD=HMAC
+      - JWT_EXPIRED_IN=86400
     depends_on:
       - db
 
