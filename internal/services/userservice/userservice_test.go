@@ -188,3 +188,55 @@ func TestUserService_GetByUsername(t *testing.T) {
 		})
 	}
 }
+
+func TestUserService_List(t *testing.T) {
+	type fields struct {
+		db userservice.UserServiceDatabaseInterface
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		want    []userservice.UserInterface
+		wantErr bool
+	}{
+		{
+			name: "listed success",
+			fields: func() fields {
+				db := &mocks.UserServiceDatabaseInterface{}
+				db.On("Find", mock.AnythingOfType("[]*userservice.User")).
+					Return(&gorm.DB{
+						Error: nil,
+					})
+
+				return fields{db}
+			}(),
+			want: []userservice.UserInterface{},
+		},
+		{
+			name: "listed fail",
+			fields: func() fields {
+				db := &mocks.UserServiceDatabaseInterface{}
+				db.On("Find", mock.AnythingOfType("[]*userservice.User")).
+					Return(&gorm.DB{
+						Error: errors.New("find error"),
+					})
+
+				return fields{db}
+			}(),
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := userservice.New(tt.fields.db)
+			got, err := s.List()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("UserService.List() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("UserService.List() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
