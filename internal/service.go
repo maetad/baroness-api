@@ -17,8 +17,30 @@ type Service struct {
 	log  *logrus.Entry
 }
 
-func New(ctx context.Context, l *logrus.Entry, options Options, r *gin.Engine) (*Service, error) {
+func New(
+	ctx context.Context,
+	l *logrus.Entry,
+	options Options,
+) (*Service, error) {
 	log = l
+
+	r := gin.Default()
+
+	db, err := dbConnect(options)
+	if err != nil {
+		log.WithError(err).Fatal("dbConnect()")
+	}
+
+	sqlDB, err := db.DB()
+	if err != nil {
+		log.WithError(err).Fatal("db.DB()")
+	}
+
+	dbAutoMigration(sqlDB)
+	if err = dbAutoMigration(sqlDB); err != nil {
+		log.WithError(err).Fatal("dbAutoMigration()")
+	}
+
 	svc := Service{
 		Http: &http.Server{
 			Addr:    options.ListenAddressHTTP,

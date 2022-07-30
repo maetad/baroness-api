@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/pakkaparn/no-idea-api/internal"
 	"github.com/sirupsen/logrus"
 )
@@ -20,9 +20,7 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	r := gin.Default()
-
-	svc, err := internal.New(ctx, log, options, r)
+	svc, err := internal.New(ctx, log, options)
 	if err != nil {
 		log.WithError(err).Fatal("internal.New()")
 	}
@@ -43,6 +41,25 @@ func init() {
 	options = internal.Options{
 		AppName:           os.Getenv("APP_NAME"),
 		ListenAddressHTTP: os.Getenv("LISTEN_ADDRESS_HTTP"),
+		DatabaseHost:      os.Getenv("DATABASE_HOST"),
+		DatabaseUser:      os.Getenv("DATABASE_USER"),
+		DatabasePass:      os.Getenv("DATABASE_PASS"),
+		DatabaseName:      os.Getenv("DATABASE_NAME"),
+		DatabasePort: func() int {
+			i, _ := strconv.Atoi(os.Getenv("DATABASE_PORT"))
+			return i
+		}(),
+		DatabaseSSLMode: func() string {
+			allow := []string{"enable", "require"}
+			for _, a := range allow {
+				if os.Getenv("DATABASE_SSL_MODE") == a {
+					return a
+				}
+			}
+
+			return "disable"
+		}(),
+		DatabaseTimezone: os.Getenv("DATABASE_TIMEZONE"),
 	}
 
 	log = logrus.WithField("app_name", options.AppName)
