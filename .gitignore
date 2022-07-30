@@ -2,3 +2,4 @@
 .DS_Store
 /volumes
 /vendor
+*.log
