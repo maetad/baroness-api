@@ -287,7 +287,7 @@ func TestAuthHandler_Authorize(t *testing.T) {
 			want: http.StatusUnauthorized,
 		},
 		{
-			name: "token valid",
+			name: "claim id not exists",
 			fields: func() fields {
 				authservice := &mocks.AuthServiceInterface{}
 
@@ -297,6 +297,106 @@ func TestAuthHandler_Authorize(t *testing.T) {
 				f := fields{
 					log:         logrus.WithContext(context.TODO()),
 					authservice: authservice,
+				}
+
+				return f
+			}(),
+			args: func() args {
+				w := httptest.NewRecorder()
+				c, _ := gin.CreateTestContext(w)
+
+				c.Request = &http.Request{
+					URL:    &url.URL{},
+					Header: make(http.Header),
+				}
+
+				c.Request.Header.Set("Authorization", "Bearer jwttoken")
+
+				return args{c}
+			}(),
+			want: http.StatusUnauthorized,
+		},
+		{
+			name: "claim username invalid",
+			fields: func() fields {
+				authservice := &mocks.AuthServiceInterface{}
+
+				authservice.On("ParseToken", "jwttoken").
+					Return(jwt.MapClaims{"username": nil}, nil)
+
+				f := fields{
+					log:         logrus.WithContext(context.TODO()),
+					authservice: authservice,
+				}
+
+				return f
+			}(),
+			args: func() args {
+				w := httptest.NewRecorder()
+				c, _ := gin.CreateTestContext(w)
+
+				c.Request = &http.Request{
+					URL:    &url.URL{},
+					Header: make(http.Header),
+				}
+
+				c.Request.Header.Set("Authorization", "Bearer jwttoken")
+
+				return args{c}
+			}(),
+			want: http.StatusUnauthorized,
+		},
+		{
+			name: "user not found",
+			fields: func() fields {
+				authservice := &mocks.AuthServiceInterface{}
+
+				authservice.On("ParseToken", "jwttoken").
+					Return(jwt.MapClaims{"username": "admin"}, nil)
+
+				u := &mocks.UserServiceInterface{}
+				u.On("GetByUsername", "admin").
+					Return(nil, errors.New("user not found"))
+
+				f := fields{
+					log:         logrus.WithContext(context.TODO()),
+					authservice: authservice,
+					userservice: u,
+				}
+
+				return f
+			}(),
+			args: func() args {
+				w := httptest.NewRecorder()
+				c, _ := gin.CreateTestContext(w)
+
+				c.Request = &http.Request{
+					URL:    &url.URL{},
+					Header: make(http.Header),
+				}
+
+				c.Request.Header.Set("Authorization", "Bearer jwttoken")
+
+				return args{c}
+			}(),
+			want: http.StatusUnauthorized,
+		},
+		{
+			name: "token valid",
+			fields: func() fields {
+				authservice := &mocks.AuthServiceInterface{}
+
+				authservice.On("ParseToken", "jwttoken").
+					Return(jwt.MapClaims{"username": "admin"}, nil)
+
+				u := &mocks.UserServiceInterface{}
+				u.On("GetByUsername", "admin").
+					Return(&userservice.User{}, nil)
+
+				f := fields{
+					log:         logrus.WithContext(context.TODO()),
+					authservice: authservice,
+					userservice: u,
 				}
 
 				return f
