@@ -239,6 +239,8 @@ func TestAuthHandler_Login(t *testing.T) {
 }
 
 func TestAuthHandler_Authorize(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
 	type fields struct {
 		log         *logrus.Entry
 		options     config.Options
