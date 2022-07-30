@@ -3,7 +3,9 @@
 package mocks
 
 import (
+	jwt "github.com/golang-jwt/jwt/v4"
 	authservice "github.com/pakkaparn/no-idea-api/internal/services/authservice"
+
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -26,6 +28,29 @@ func (_m *AuthServiceInterface) GenerateToken(c authservice.Claimer) (string, er
 	var r1 error
 	if rf, ok := ret.Get(1).(func(authservice.Claimer) error); ok {
 		r1 = rf(c)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// ParseToken provides a mock function with given fields: tokenString
+func (_m *AuthServiceInterface) ParseToken(tokenString string) (jwt.MapClaims, error) {
+	ret := _m.Called(tokenString)
+
+	var r0 jwt.MapClaims
+	if rf, ok := ret.Get(0).(func(string) jwt.MapClaims); ok {
+		r0 = rf(tokenString)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(jwt.MapClaims)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(tokenString)
 	} else {
 		r1 = ret.Error(1)
 	}
