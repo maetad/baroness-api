@@ -44,6 +44,8 @@ func TestNewAuthHandler(t *testing.T) {
 }
 
 func TestAuthHandler_LoginHandler(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
 	type fields struct {
 		log         *logrus.Entry
 		authservice authservice.AuthServiceInterface
@@ -52,6 +54,7 @@ func TestAuthHandler_LoginHandler(t *testing.T) {
 	type args struct {
 		c *gin.Context
 	}
+
 	tests := []struct {
 		name   string
 		fields fields

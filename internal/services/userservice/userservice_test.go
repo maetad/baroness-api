@@ -99,17 +99,21 @@ func TestUserService_Create(t *testing.T) {
 			}
 
 			if tt.want != nil {
-				if got.Username != tt.want.Username {
-					t.Errorf("UserService.Create() = %v, want %v", got.Username, tt.want.Username)
-				}
-				if got.DisplayName != tt.want.DisplayName {
-					t.Errorf("UserService.Create() = %v, want %v", got.DisplayName, tt.want.DisplayName)
-				}
+				user := got.(*userservice.User)
 
 				if err := got.ValidatePassword(tt.args.r.Password); err != nil {
 					t.Errorf("UserService.Create() password hashed invalid %v", err)
 				}
-			} else if !reflect.DeepEqual(got, tt.want) {
+
+				// ignore password difference
+				user.Password = ""
+				clone := tt.want
+				clone.Password = ""
+
+				if !reflect.DeepEqual(user, clone) {
+					t.Errorf("UserService.Create() = %v, want %v", user, tt.want)
+				}
+			} else if got != nil {
 				t.Errorf("UserService.Create() = %v, want %v", got, tt.want)
 			}
 		})
@@ -173,8 +177,13 @@ func TestUserService_GetByUsername(t *testing.T) {
 				t.Errorf("UserService.GetByUsername() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("UserService.GetByUsername() = %v, want %v", got, tt.want)
+
+			if tt.want != nil {
+				if !reflect.DeepEqual(got, tt.want) {
+					t.Errorf("UserService.GetByUsername() = %v, want %v", got, tt.want)
+				}
+			} else if got != nil {
+				t.Errorf("UserService.Create() = %v, want %v", got, tt.want)
 			}
 		})
 	}

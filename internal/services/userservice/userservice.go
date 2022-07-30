@@ -4,7 +4,7 @@ import "gorm.io/gorm"
 
 type UserServiceDatabaseInterface interface {
 	Create(value interface{}) (tx *gorm.DB)
-	First(value interface{}) (tx *gorm.DB)
+	First(dest interface{}, conds ...interface{}) (tx *gorm.DB)
 }
 
 type UserService struct {
@@ -16,11 +16,11 @@ type UserServiceInterface interface {
 	GetByUsername(username string) (UserInterface, error)
 }
 
-func New(db UserServiceDatabaseInterface) UserService {
+func New(db UserServiceDatabaseInterface) UserServiceInterface {
 	return UserService{db}
 }
 
-func (u UserService) Create(r UserCreateRequest) (*User, error) {
+func (u UserService) Create(r UserCreateRequest) (UserInterface, error) {
 	user := &User{
 		Username:    r.Username,
 		DisplayName: r.DisplayName,
@@ -35,7 +35,7 @@ func (u UserService) Create(r UserCreateRequest) (*User, error) {
 	return user, nil
 }
 
-func (u UserService) GetByUsername(username string) (*User, error) {
+func (u UserService) GetByUsername(username string) (UserInterface, error) {
 	user := &User{
 		Username: username,
 	}

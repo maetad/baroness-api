@@ -28,13 +28,16 @@ func (_m *UserServiceDatabaseInterface) Create(value interface{}) *gorm.DB {
 	return r0
 }
 
-// First provides a mock function with given fields: value
-func (_m *UserServiceDatabaseInterface) First(value interface{}) *gorm.DB {
-	ret := _m.Called(value)
+// First provides a mock function with given fields: dest, conds
+func (_m *UserServiceDatabaseInterface) First(dest interface{}, conds ...interface{}) *gorm.DB {
+	var _ca []interface{}
+	_ca = append(_ca, dest)
+	_ca = append(_ca, conds...)
+	ret := _m.Called(_ca...)
 
 	var r0 *gorm.DB
-	if rf, ok := ret.Get(0).(func(interface{}) *gorm.DB); ok {
-		r0 = rf(value)
+	if rf, ok := ret.Get(0).(func(interface{}, ...interface{}) *gorm.DB); ok {
+		r0 = rf(dest, conds...)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*gorm.DB)
