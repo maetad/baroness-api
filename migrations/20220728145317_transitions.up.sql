@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS "public"."transitions" (
   "id" serial NOT NULL,
   PRIMARY KEY ("id"),
+  "workflow_id" integer NOT NULL REFERENCES "public"."workflows"("id"),
   "parent_id" integer NOT NULL REFERENCES "public"."states"("id"),
   "target_id" integer NOT NULL REFERENCES "public"."states"("id"),
   "name" text NOT NULL,
