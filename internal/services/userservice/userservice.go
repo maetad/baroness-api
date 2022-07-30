@@ -15,6 +15,7 @@ type UserService struct {
 type UserServiceInterface interface {
 	List() ([]UserInterface, error)
 	Create(r UserCreateRequest) (UserInterface, error)
+	Get(id uint) (UserInterface, error)
 	GetByUsername(username string) (UserInterface, error)
 }
 
@@ -46,6 +47,16 @@ func (s UserService) Create(r UserCreateRequest) (UserInterface, error) {
 	user.SetPassword(r.Password)
 
 	if result := s.db.Create(user); result.Error != nil {
+		return nil, result.Error
+	}
+
+	return user, nil
+}
+
+func (s UserService) Get(id uint) (UserInterface, error) {
+	user := &User{}
+
+	if result := s.db.First(user, id); result.Error != nil {
 		return nil, result.Error
 	}
 

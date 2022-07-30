@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pakkaparn/no-idea-api/internal/services/userservice"
@@ -42,4 +43,25 @@ func (h *UserHandler) Create(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, user)
+}
+
+func (h *UserHandler) Get(c *gin.Context) {
+	var (
+		id  int
+		err error
+	)
+
+	if id, err = strconv.Atoi(c.Param("id")); err != nil {
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
+
+	user, err := h.userservice.Get(uint(id))
+	if err != nil {
+		h.log.WithError(err).Errorf("Get(): h.userservice.Get error %v", err)
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
 }

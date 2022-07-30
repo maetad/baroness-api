@@ -240,3 +240,65 @@ func TestUserService_List(t *testing.T) {
 		})
 	}
 }
+
+func TestUserService_Get(t *testing.T) {
+	type fields struct {
+		db userservice.UserServiceDatabaseInterface
+	}
+	type args struct {
+		id uint
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    userservice.UserInterface
+		wantErr bool
+	}{
+		{
+			name: "user found",
+			fields: func() fields {
+				db := &mocks.UserServiceDatabaseInterface{}
+				db.On("First", mock.AnythingOfType("*userservice.User"), uint(1)).
+					Return(&gorm.DB{
+						Error: nil,
+					})
+
+				return fields{db}
+			}(),
+			args: args{
+				id: 1,
+			},
+			want: &userservice.User{},
+		},
+		{
+			name: "user not found",
+			fields: func() fields {
+				db := &mocks.UserServiceDatabaseInterface{}
+				db.On("First", mock.AnythingOfType("*userservice.User"), uint(1)).
+					Return(&gorm.DB{
+						Error: errors.New("user not found"),
+					})
+
+				return fields{db}
+			}(),
+			args: args{
+				id: 1,
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := userservice.New(tt.fields.db)
+			got, err := s.Get(tt.args.id)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("UserService.Get() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("UserService.Get() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
