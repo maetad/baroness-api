@@ -50,8 +50,11 @@ func init() {
 			return i
 		}(),
 		DatabaseSSLMode: func() string {
-			if os.Getenv("DATABASE_SSL_MODE") == "require" {
-				return "require"
+			allow := []string{"enable", "require"}
+			for _, a := range allow {
+				if os.Getenv("DATABASE_SSL_MODE") == a {
+					return a
+				}
 			}
 
 			return "disable"
