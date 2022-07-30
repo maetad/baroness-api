@@ -26,8 +26,9 @@ func registerRouter(
 	authorized := r.Group("/")
 	authorized.Use(authHandler.Authorize)
 	{
-		meHandler := handlers.NewMeHandler(l)
+		meHandler := handlers.NewMeHandler(l, services.userservice)
 		authorized.GET("/me", meHandler.Get)
+		authorized.PUT("/me", meHandler.Update)
 
 		userRoute := authorized.Group("/users")
 		{
