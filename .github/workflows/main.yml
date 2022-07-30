@@ -19,7 +19,7 @@ jobs:
           go-version: '1.18'
       - name: Run golint
         uses: reviewdog/action-golangci-lint@v2
-  build:
+  codecov:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -32,3 +32,9 @@ jobs:
         run: go test -race -coverprofile=coverage.out -covermode=atomic
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage.out
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: true
+          verbose: true
