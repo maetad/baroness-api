@@ -39,5 +39,15 @@ func registerRouter(
 			userRoute.PUT("/:id", userHandler.Update)
 			userRoute.DELETE("/:id", userHandler.Delete)
 		}
+
+		eventRoute := authorized.Group("/events")
+		{
+			eventHandler := handlers.NewEventHandler(l, services.eventservice)
+			eventRoute.GET("/", eventHandler.List)
+			eventRoute.POST("/", eventHandler.Create)
+			eventRoute.GET("/:id", eventHandler.Get)
+			eventRoute.PUT("/:id", eventHandler.Update)
+			eventRoute.DELETE("/:id", eventHandler.Delete)
+		}
 	}
 }

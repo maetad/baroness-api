@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/lib/pq"
-	"github.com/pakkaparn/no-idea-api/internal/model"
+	"github.com/maetad/baroness-api/internal/model"
 )
 
 type Event struct {

@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/pakkaparn/no-idea-api/internal/database"
-	"github.com/pakkaparn/no-idea-api/internal/services/eventservice"
-	"github.com/pakkaparn/no-idea-api/mocks"
+	"github.com/maetad/baroness-api/internal/database"
+	"github.com/maetad/baroness-api/internal/services/eventservice"
+	"github.com/maetad/baroness-api/mocks"
 	"github.com/stretchr/testify/mock"
 	"gorm.io/gorm"
 )

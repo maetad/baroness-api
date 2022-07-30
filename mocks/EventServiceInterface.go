@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	eventservice "github.com/pakkaparn/no-idea-api/internal/services/eventservice"
+	eventservice "github.com/maetad/baroness-api/internal/services/eventservice"
 	mock "github.com/stretchr/testify/mock"
 )
 

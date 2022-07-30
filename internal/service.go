@@ -8,6 +8,7 @@ import (
 	"github.com/maetad/baroness-api/internal/config"
 	"github.com/maetad/baroness-api/internal/database"
 	"github.com/maetad/baroness-api/internal/services/authservice"
+	"github.com/maetad/baroness-api/internal/services/eventservice"
 	"github.com/maetad/baroness-api/internal/services/fileservice"
 	"github.com/maetad/baroness-api/internal/services/fileservice/storageprovider"
 	"github.com/maetad/baroness-api/internal/services/userservice"
@@ -22,9 +23,10 @@ type Service struct {
 }
 
 type internalService struct {
-	authservice authservice.AuthServiceInterface
-	userservice userservice.UserServiceInterface
-	fileservice fileservice.FileServiceInterface
+	authservice  authservice.AuthServiceInterface
+	userservice  userservice.UserServiceInterface
+	fileservice  fileservice.FileServiceInterface
+	eventservice eventservice.EventServiceInterface
 }
 
 func New(
@@ -59,9 +61,10 @@ func New(
 	}
 
 	services := internalService{
-		authservice: authservice.New(options.JWTSigningMethod, options.JWTSigningKey, options.JWTAllowMethod),
-		userservice: userservice.New(db),
-		fileservice: storageprovider.NewProvider(options.StorageProvider, options.StorageConfig),
+		authservice:  authservice.New(options.JWTSigningMethod, options.JWTSigningKey, options.JWTAllowMethod),
+		userservice:  userservice.New(db),
+		fileservice:  storageprovider.NewProvider(options.StorageProvider, options.StorageConfig),
+		eventservice: eventservice.New(db),
 	}
 
 	registerRouter(r, l, options, services)
