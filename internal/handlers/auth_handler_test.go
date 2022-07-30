@@ -45,7 +45,7 @@ func TestNewAuthHandler(t *testing.T) {
 	}
 }
 
-func TestAuthHandler_LoginHandler(t *testing.T) {
+func TestAuthHandler_Login(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	type fields struct {
@@ -227,10 +227,10 @@ func TestAuthHandler_LoginHandler(t *testing.T) {
 				tt.fields.authservice,
 				tt.fields.userservice,
 			)
-			h.LoginHandler(tt.args.c)
+			h.Login(tt.args.c)
 
 			if tt.args.c.Writer.Status() != tt.want {
-				t.Errorf("LoginHandler() = %v, want %v", tt.args.c.Writer.Status(), tt.want)
+				t.Errorf("Login() = %v, want %v", tt.args.c.Writer.Status(), tt.want)
 			}
 		})
 	}

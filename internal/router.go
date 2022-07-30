@@ -22,7 +22,7 @@ func registerRouter(
 	authRoute := r.Group("/auth")
 	{
 		authHandler := handlers.NewAuthHandler(l, o, services.authservice, services.userservice)
-		authRoute.POST("/login", authHandler.LoginHandler)
+		authRoute.POST("/login", authHandler.Login)
 	}
 
 	userRoute := r.Group("/users")

@@ -26,7 +26,7 @@ func NewAuthHandler(
 	return &AuthHandler{log, options, authservice, userservice}
 }
 
-func (h *AuthHandler) LoginHandler(c *gin.Context) {
+func (h *AuthHandler) Login(c *gin.Context) {
 	var req struct {
 		Username string `json:"username" binding:"required"`
 		Password string `json:"password" binding:"required"`
