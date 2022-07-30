@@ -9,6 +9,7 @@ import (
 	"github.com/maetad/baroness-api/internal/database"
 	"github.com/maetad/baroness-api/internal/services/authservice"
 	"github.com/maetad/baroness-api/internal/services/eventservice"
+	"github.com/maetad/baroness-api/internal/services/fieldservice"
 	"github.com/maetad/baroness-api/internal/services/fileservice"
 	"github.com/maetad/baroness-api/internal/services/fileservice/storageprovider"
 	"github.com/maetad/baroness-api/internal/services/stateservice"
@@ -33,6 +34,7 @@ type internalService struct {
 	workflowservice   workflowservice.WorkflowServiceInterface
 	stateservice      stateservice.StateServiceInterface
 	transitionservice transitionservice.TransitionServiceInterface
+	fieldservice      fieldservice.FieldServiceInterface
 }
 
 func New(
