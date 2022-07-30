@@ -3,22 +3,49 @@ package internal
 import (
 	"context"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/pakkaparn/no-idea-api/internal/config"
+	"github.com/pakkaparn/no-idea-api/internal/services/authservice"
+	"github.com/pakkaparn/no-idea-api/internal/services/userservice"
 	"github.com/sirupsen/logrus"
 )
 
 var log *logrus.Entry
-var timeout = 10 * time.Second
 
 type Service struct {
 	Http *http.Server
 	log  *logrus.Entry
 }
 
-func New(ctx context.Context, l *logrus.Entry, options Options, r *gin.Engine) (*Service, error) {
+type internalService struct {
+	authservice authservice.AuthServiceInterface
+	userservice userservice.UserServiceInterface
+}
+
+func New(
+	ctx context.Context,
+	l *logrus.Entry,
+	options config.Options,
+) (*Service, error) {
 	log = l
+
+	r := gin.Default()
+
+	db, err := dbConnect(options)
+	if err != nil {
+		log.WithError(err).Fatal("dbConnect()")
+	}
+
+	sqlDB, err := db.DB()
+	if err != nil {
+		log.WithError(err).Fatal("db.DB()")
+	}
+
+	if err = dbAutoMigration(sqlDB); err != nil {
+		log.WithError(err).Fatal("dbAutoMigration()")
+	}
+
 	svc := Service{
 		Http: &http.Server{
 			Addr:    options.ListenAddressHTTP,
@@ -27,7 +54,12 @@ func New(ctx context.Context, l *logrus.Entry, options Options, r *gin.Engine) (
 		log: l,
 	}
 
-	registerRouter(r)
+	services := internalService{
+		authservice: authservice.New(options.JWTSigningMethod, options.JWTSigningKey, options.JWTAllowMethod),
+		userservice: userservice.New(db),
+	}
+
+	registerRouter(r, l, options, services)
 
 	return &svc, nil
 }

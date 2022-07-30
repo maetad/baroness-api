@@ -1,0 +1,47 @@
+version: "3.8"
+services:
+  api:
+    container_name: noidea_api
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      target: prod
+    restart: on-failure
+    ports:
+      - 4000:3000
+    environment:
+      - APP_NAME=no-idea
+      - LISTEN_ADDRESS_HTTP=:3000
+      - DATABASE_HOST=postgres
+      - DATABASE_USER=postgres
+      - DATABASE_PASS=postgres
+      - DATABASE_NAME=noidea
+      - DATABASE_PORT=5432
+      - DATABASE_TIMEZONE=Asia/Bangkok
+      - JWT_SIGNING_METHOD=HS256
+      - JWT_SIGNING_KEY=mykey
+      - JWT_ALLOW_METHOD=HMAC
+      - JWT_EXPIRED_IN=86400
+    depends_on:
+      - db
+
+  db:
+    container_name: noidea_db
+    hostname: postgres
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=noidea
+    volumes:
+      - ./volumes/postgresql:/var/lib/postgresql
+
+  adminer:
+    container_name: noidea_adminer
+    image: adminer
+    restart: always
+    ports:
+      - 4001:8080
+    depends_on:
+      - db

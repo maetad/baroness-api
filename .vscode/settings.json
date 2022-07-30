@@ -1,5 +1,7 @@
 {
     "conventionalCommits.scopes": [
-        "structure"
+        "structure",
+        "user",
+        "auth"
     ]
 }
