@@ -1,4 +1,4 @@
-package user
+package userservice
 
 import "golang.org/x/crypto/bcrypt"
 
