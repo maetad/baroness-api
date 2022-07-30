@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/pakkaparn/no-idea-api/internal/services/userservice"
+	"github.com/maetad/baroness-api/internal/services/userservice"
 	"github.com/sirupsen/logrus"
 )
 

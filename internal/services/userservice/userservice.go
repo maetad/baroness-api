@@ -1,7 +1,7 @@
 package userservice
 
 import (
-	"github.com/pakkaparn/no-idea-api/internal/database"
+	"github.com/maetad/baroness-api/internal/database"
 )
 
 type UserService struct {

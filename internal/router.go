@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/pakkaparn/no-idea-api/internal/config"
-	"github.com/pakkaparn/no-idea-api/internal/handlers"
+	"github.com/maetad/baroness-api/internal/config"
+	"github.com/maetad/baroness-api/internal/handlers"
 	"github.com/sirupsen/logrus"
 )
 

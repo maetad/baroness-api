@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/pakkaparn/no-idea-api/internal/services/authservice"
+	"github.com/maetad/baroness-api/internal/services/authservice"
 )
 
 type Options struct {

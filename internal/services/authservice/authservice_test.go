@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/pakkaparn/no-idea-api/internal/services/authservice"
-	"github.com/pakkaparn/no-idea-api/mocks"
+	"github.com/maetad/baroness-api/internal/services/authservice"
+	"github.com/maetad/baroness-api/mocks"
 )
 
 var PEM = `-----BEGIN PUBLIC KEY-----

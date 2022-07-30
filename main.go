@@ -12,9 +12,9 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/pakkaparn/no-idea-api/internal"
-	"github.com/pakkaparn/no-idea-api/internal/config"
-	"github.com/pakkaparn/no-idea-api/internal/services/authservice"
+	"github.com/maetad/baroness-api/internal"
+	"github.com/maetad/baroness-api/internal/config"
+	"github.com/maetad/baroness-api/internal/services/authservice"
 	"github.com/sirupsen/logrus"
 )
 

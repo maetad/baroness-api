@@ -1,7 +1,7 @@
 package userservice
 
 import (
-	"github.com/pakkaparn/no-idea-api/internal/model"
+	"github.com/maetad/baroness-api/internal/model"
 	"golang.org/x/crypto/bcrypt"
 )
 

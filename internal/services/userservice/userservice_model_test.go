@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/pakkaparn/no-idea-api/internal/model"
-	"github.com/pakkaparn/no-idea-api/internal/services/userservice"
+	"github.com/maetad/baroness-api/internal/model"
+	"github.com/maetad/baroness-api/internal/services/userservice"
 )
 
 func TestUser_SetPassword(t *testing.T) {

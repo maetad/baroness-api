@@ -1,4 +1,4 @@
-module github.com/pakkaparn/no-idea-api
+module github.com/maetad/baroness-api
 
 go 1.18
 

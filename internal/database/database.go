@@ -7,7 +7,7 @@ import (
 	migrate "github.com/golang-migrate/migrate/v4"
 	migratepg "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
-	"github.com/pakkaparn/no-idea-api/internal/config"
+	"github.com/maetad/baroness-api/internal/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

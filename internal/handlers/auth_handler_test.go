@@ -13,11 +13,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/pakkaparn/no-idea-api/internal/config"
-	"github.com/pakkaparn/no-idea-api/internal/handlers"
-	"github.com/pakkaparn/no-idea-api/internal/services/authservice"
-	"github.com/pakkaparn/no-idea-api/internal/services/userservice"
-	"github.com/pakkaparn/no-idea-api/mocks"
+	"github.com/maetad/baroness-api/internal/config"
+	"github.com/maetad/baroness-api/internal/handlers"
+	"github.com/maetad/baroness-api/internal/services/authservice"
+	"github.com/maetad/baroness-api/internal/services/userservice"
+	"github.com/maetad/baroness-api/mocks"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/mock"
 )

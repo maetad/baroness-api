@@ -5,9 +5,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/pakkaparn/no-idea-api/internal/database"
-	"github.com/pakkaparn/no-idea-api/internal/services/userservice"
-	"github.com/pakkaparn/no-idea-api/mocks"
+	"github.com/maetad/baroness-api/internal/database"
+	"github.com/maetad/baroness-api/internal/services/userservice"
+	"github.com/maetad/baroness-api/mocks"
 	"github.com/stretchr/testify/mock"
 	"gorm.io/gorm"
 )

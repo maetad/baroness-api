@@ -4,7 +4,7 @@ package mocks
 
 import (
 	jwt "github.com/golang-jwt/jwt/v4"
-	authservice "github.com/pakkaparn/no-idea-api/internal/services/authservice"
+	authservice "github.com/maetad/baroness-api/internal/services/authservice"
 
 	mock "github.com/stretchr/testify/mock"
 
