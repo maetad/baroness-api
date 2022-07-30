@@ -37,6 +37,9 @@ func New(
 	}
 
 	dbAutoMigration(sqlDB)
+	if err = dbAutoMigration(sqlDB); err != nil {
+		log.WithError(err).Fatal("dbAutoMigration()")
+	}
 
 	svc := Service{
 		Http: &http.Server{
