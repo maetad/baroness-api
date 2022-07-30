@@ -3,6 +3,7 @@ package authservice
 import (
 	"fmt"
 	"reflect"
+	"time"
 
 	"github.com/golang-jwt/jwt/v4"
 )
@@ -14,7 +15,7 @@ type AuthService struct {
 }
 
 type AuthServiceInterface interface {
-	GenerateToken(c Claimer) (string, error)
+	GenerateToken(c Claimer, expiredIn time.Duration) (string, error)
 	ParseToken(tokenString string) (jwt.MapClaims, error)
 }
 
@@ -49,12 +50,16 @@ func New(method jwt.SigningMethod, key interface{}, allowSigningMethod AllowSign
 	return &AuthService{method, key, allowSigningMethod}
 }
 
-func (s AuthService) GenerateToken(c Claimer) (string, error) {
+func (s AuthService) GenerateToken(c Claimer, expiredIn time.Duration) (string, error) {
 	claims := jwt.MapClaims{}
 
 	for k, v := range c.GetClaims() {
 		claims[k] = v
 	}
+
+	claims["iat"] = time.Now()
+	claims["nbf"] = time.Now()
+	claims["exp"] = time.Now().Add(expiredIn).Unix()
 
 	token := jwt.NewWithClaims(s.signingMethod, claims)
 

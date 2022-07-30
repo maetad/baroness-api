@@ -13,12 +13,13 @@ import (
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/pakkaparn/no-idea-api/internal"
+	"github.com/pakkaparn/no-idea-api/internal/config"
 	"github.com/pakkaparn/no-idea-api/internal/services/authservice"
 	"github.com/sirupsen/logrus"
 )
 
 var log *logrus.Entry
-var options internal.Options
+var options config.Options
 
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
@@ -42,7 +43,7 @@ func main() {
 }
 
 func init() {
-	options = internal.Options{
+	options = config.Options{
 		AppName:           os.Getenv("APP_NAME"),
 		ListenAddressHTTP: os.Getenv("LISTEN_ADDRESS_HTTP"),
 		DatabaseHost:      os.Getenv("DATABASE_HOST"),
@@ -103,6 +104,18 @@ func init() {
 				allow.Allowed(a)
 			}
 			return allow
+		}(),
+		JWTExpiredIn: func() time.Duration {
+			var (
+				t   int
+				err error
+			)
+
+			if t, err = strconv.Atoi(os.Getenv("JWT_EXPIRED_IN")); err != nil {
+				t = 30
+			}
+
+			return time.Duration(t * int(time.Second))
 		}(),
 	}
 

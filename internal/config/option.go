@@ -1,6 +1,8 @@
-package internal
+package config
 
 import (
+	"time"
+
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/pakkaparn/no-idea-api/internal/services/authservice"
 )
@@ -18,4 +20,5 @@ type Options struct {
 	JWTSigningMethod  jwt.SigningMethod
 	JWTSigningKey     []byte
 	JWTAllowMethod    authservice.AllowSigningMethod
+	JWTExpiredIn      time.Duration
 }

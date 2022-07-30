@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"regexp"
 	"testing"
+	"time"
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/pakkaparn/no-idea-api/internal/services/authservice"
@@ -62,7 +63,7 @@ func TestAuthService_GenerateToken(t *testing.T) {
 			})
 
 			s := authservice.New(tt.fields.signingMethod, tt.fields.signingKey, tt.fields.allowSigningMethod)
-			got, err := s.GenerateToken(tt.args.c)
+			got, err := s.GenerateToken(tt.args.c, time.Minute)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("AuthService.GenerateToken() error = %v, wantErr %v", err, tt.wantErr)
 				return

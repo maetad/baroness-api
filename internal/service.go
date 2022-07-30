@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/pakkaparn/no-idea-api/internal/config"
 	"github.com/pakkaparn/no-idea-api/internal/services/authservice"
 	"github.com/pakkaparn/no-idea-api/internal/services/userservice"
 	"github.com/sirupsen/logrus"
@@ -27,7 +28,7 @@ type internalService struct {
 func New(
 	ctx context.Context,
 	l *logrus.Entry,
-	options Options,
+	options config.Options,
 ) (*Service, error) {
 	log = l
 
@@ -60,7 +61,7 @@ func New(
 		userservice: userservice.New(db),
 	}
 
-	registerRouter(r, l, services)
+	registerRouter(r, l, options, services)
 
 	return &svc, nil
 }

@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/pakkaparn/no-idea-api/internal/config"
 	"github.com/pakkaparn/no-idea-api/internal/handlers"
 	"github.com/pakkaparn/no-idea-api/internal/services/authservice"
 	"github.com/pakkaparn/no-idea-api/internal/services/userservice"
@@ -22,6 +23,7 @@ import (
 func TestNewAuthHandler(t *testing.T) {
 	type args struct {
 		log         *logrus.Entry
+		options     config.Options
 		authservice authservice.AuthServiceInterface
 		userservice userservice.UserServiceInterface
 	}
@@ -36,7 +38,7 @@ func TestNewAuthHandler(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := handlers.NewAuthHandler(tt.args.log, tt.args.authservice, tt.args.userservice); reflect.TypeOf(got) != reflect.TypeOf(&handlers.AuthHandler{}) {
+			if got := handlers.NewAuthHandler(tt.args.log, tt.args.options, tt.args.authservice, tt.args.userservice); reflect.TypeOf(got) != reflect.TypeOf(&handlers.AuthHandler{}) {
 				t.Errorf("New() = %v, want %v", got, tt.want)
 			}
 		})
@@ -50,6 +52,7 @@ func TestAuthHandler_LoginHandler(t *testing.T) {
 		log         *logrus.Entry
 		authservice authservice.AuthServiceInterface
 		userservice userservice.UserServiceInterface
+		options     config.Options
 	}
 	type args struct {
 		c *gin.Context
@@ -151,7 +154,7 @@ func TestAuthHandler_LoginHandler(t *testing.T) {
 				userservice.On("GetByUsername", mock.AnythingOfType("string")).
 					Return(user, nil)
 
-				authservice.On("GenerateToken", mock.Anything).
+				authservice.On("GenerateToken", mock.Anything, mock.Anything).
 					Return("", errors.New("generate token fail"))
 
 				f := fields{
@@ -191,11 +194,10 @@ func TestAuthHandler_LoginHandler(t *testing.T) {
 				userservice.On("GetByUsername", mock.AnythingOfType("string")).
 					Return(user, nil)
 
-				authservice.On("GenerateToken", mock.Anything).
+				authservice.On("GenerateToken", mock.Anything, mock.Anything).
 					Return("token", nil)
 
 				f := fields{
-					log:         &logrus.Entry{},
 					userservice: userservice,
 					authservice: authservice,
 				}
@@ -221,6 +223,7 @@ func TestAuthHandler_LoginHandler(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			h := handlers.NewAuthHandler(
 				tt.fields.log,
+				tt.fields.options,
 				tt.fields.authservice,
 				tt.fields.userservice,
 			)

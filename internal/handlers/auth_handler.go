@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/pakkaparn/no-idea-api/internal/config"
 	"github.com/pakkaparn/no-idea-api/internal/services/authservice"
 	"github.com/pakkaparn/no-idea-api/internal/services/userservice"
 	"github.com/sirupsen/logrus"
@@ -11,16 +12,18 @@ import (
 
 type AuthHandler struct {
 	log         *logrus.Entry
+	options     config.Options
 	authservice authservice.AuthServiceInterface
 	userservice userservice.UserServiceInterface
 }
 
 func NewAuthHandler(
 	log *logrus.Entry,
+	options config.Options,
 	authservice authservice.AuthServiceInterface,
 	userservice userservice.UserServiceInterface,
 ) *AuthHandler {
-	return &AuthHandler{log, authservice, userservice}
+	return &AuthHandler{log, options, authservice, userservice}
 }
 
 func (h *AuthHandler) LoginHandler(c *gin.Context) {
@@ -51,7 +54,7 @@ func (h *AuthHandler) LoginHandler(c *gin.Context) {
 		return
 	}
 
-	token, err := h.authservice.GenerateToken(user.(*userservice.User))
+	token, err := h.authservice.GenerateToken(user.(*userservice.User), h.options.JWTExpiredIn)
 	if err != nil {
 		h.log.WithError(err)
 		c.AbortWithStatus(http.StatusInternalServerError)
