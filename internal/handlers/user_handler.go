@@ -101,17 +101,30 @@ func (h *UserHandler) Update(c *gin.Context) {
 
 func (h *UserHandler) Delete(c *gin.Context) {
 	var (
-		id  int
-		err error
+		currentUser *userservice.User
+		ok          bool
+		id          int
+		err         error
+		user        userservice.UserInterface
 	)
+
+	if currentUser, ok = c.MustGet("user").(*userservice.User); !ok {
+		h.log.Error(`Delete(): c.MustGet("user") is not *userservice.User`)
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
 
 	if id, err = strconv.Atoi(c.Param("id")); err != nil {
 		c.AbortWithStatus(http.StatusNotFound)
 		return
 	}
 
-	user, err := h.userservice.Get(uint(id))
-	if err != nil {
+	if currentUser.ID == uint(id) {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	if user, err = h.userservice.Get(uint(id)); err != nil {
 		h.log.WithError(err).Errorf("Delete(): h.userservice.Get error %v", err)
 		c.AbortWithStatus(http.StatusNotFound)
 		return

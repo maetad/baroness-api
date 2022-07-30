@@ -21,18 +21,22 @@ func registerRouter(
 
 	authHandler := handlers.NewAuthHandler(l, o, services.authservice, services.userservice)
 
-	authRoute := r.Group("/auth")
-	{
-		authRoute.POST("/login", authHandler.Login)
-	}
+	r.POST("/auth/login", authHandler.Login)
 
-	userRoute := r.Group("/users").Use(authHandler.Authorize)
+	authorized := r.Group("/")
+	authorized.Use(authHandler.Authorize)
 	{
-		userHandler := handlers.NewUserHandler(l, services.userservice)
-		userRoute.GET("/", userHandler.List)
-		userRoute.POST("/", userHandler.Create)
-		userRoute.GET("/:id", userHandler.Get)
-		userRoute.PUT("/:id", userHandler.Update)
-		userRoute.DELETE("/:id", userHandler.Delete)
+		meHandler := handlers.NewMeHandler(l)
+		authorized.GET("/me", meHandler.Get)
+
+		userRoute := authorized.Group("/users")
+		{
+			userHandler := handlers.NewUserHandler(l, services.userservice)
+			userRoute.GET("/", userHandler.List)
+			userRoute.POST("/", userHandler.Create)
+			userRoute.GET("/:id", userHandler.Get)
+			userRoute.PUT("/:id", userHandler.Update)
+			userRoute.DELETE("/:id", userHandler.Delete)
+		}
 	}
 }

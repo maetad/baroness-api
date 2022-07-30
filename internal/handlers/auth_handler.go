@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/pakkaparn/no-idea-api/internal/config"
 	"github.com/pakkaparn/no-idea-api/internal/services/authservice"
 	"github.com/pakkaparn/no-idea-api/internal/services/userservice"
@@ -68,11 +69,38 @@ func (h *AuthHandler) Login(c *gin.Context) {
 func (h *AuthHandler) Authorize(c *gin.Context) {
 	s := c.Request.Header.Get("Authorization")
 	token := strings.TrimPrefix(s, "Bearer ")
-	if _, err := h.authservice.ParseToken(token); err != nil {
+
+	var (
+		claims jwt.MapClaims
+		user   userservice.UserInterface
+		err    error
+	)
+
+	if claims, err = h.authservice.ParseToken(token); err != nil {
 		h.log.WithError(err).Errorf("Authorize(): h.authservice.ParseToken error %v", err)
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
+
+	if claims["username"] == nil {
+		h.log.Error("Authorize(): claims username not exists")
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	if _, ok := claims["username"].(string); !ok {
+		h.log.Error("Authorize(): claims usernamed is not string")
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	if user, err = h.userservice.GetByUsername(claims["username"].(string)); err != nil {
+		h.log.WithError(err).Errorf("Authorize(): h.userservice.Get error %v", err)
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	c.Set("user", user)
 
 	c.Next()
 }
