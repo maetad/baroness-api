@@ -49,6 +49,16 @@ func registerRouter(
 			eventRoute.PUT("/:event_id", eventHandler.Get, eventHandler.Update)
 			eventRoute.DELETE("/:event_id", eventHandler.Get, eventHandler.Delete)
 		}
+
+		workflowHandler := handlers.NewWorkflowHandler(l, services.workflowservice)
+		workflowRoute := authorized.Group("/events/:event_id/workflows")
+		workflowRoute.Use(eventHandler.Get)
+		{
+			workflowRoute.GET("/", workflowHandler.List)
+			workflowRoute.POST("/", workflowHandler.Create)
+			workflowRoute.GET("/:workflow_id", workflowHandler.Get)
+			workflowRoute.PUT("/:workflow_id", workflowHandler.Update)
+			workflowRoute.DELETE("/:workflow_id", workflowHandler.Delete)
 		}
 	}
 }

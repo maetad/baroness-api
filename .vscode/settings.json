@@ -4,6 +4,7 @@
         "user",
         "auth",
         "file",
-        "event"
+        "event",
+        "workflow"
     ]
 }
