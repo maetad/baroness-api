@@ -2,6 +2,7 @@ package authservice
 
 import (
 	"fmt"
+	"reflect"
 
 	"github.com/golang-jwt/jwt/v4"
 )
@@ -23,6 +24,21 @@ type AllowSigningMethod struct {
 	HMAC    bool
 	RSA     bool
 	RSAPSS  bool
+}
+
+func (a *AllowSigningMethod) Allowed(k string) {
+	ps := reflect.ValueOf(a)
+	s := ps.Elem()
+	if s.Kind() == reflect.Struct {
+		f := s.FieldByName(k)
+		if f.IsValid() {
+			if f.CanSet() {
+				if f.Kind() == reflect.Bool {
+					f.SetBool(true)
+				}
+			}
+		}
+	}
 }
 
 type Claimer interface {

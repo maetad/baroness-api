@@ -1,5 +1,10 @@
 package internal
 
+import (
+	"github.com/golang-jwt/jwt/v4"
+	"github.com/pakkaparn/no-idea-api/internal/services/authservice"
+)
+
 type Options struct {
 	AppName           string
 	ListenAddressHTTP string
@@ -10,4 +15,7 @@ type Options struct {
 	DatabasePort      int
 	DatabaseSSLMode   string
 	DatabaseTimezone  string
+	JWTSigningMethod  jwt.SigningMethod
+	JWTSigningKey     []byte
+	JWTAllowMethod    authservice.AllowSigningMethod
 }

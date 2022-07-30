@@ -2,14 +2,18 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
 	"strconv"
+	"strings"
 	"syscall"
 	"time"
 
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/pakkaparn/no-idea-api/internal"
+	"github.com/pakkaparn/no-idea-api/internal/services/authservice"
 	"github.com/sirupsen/logrus"
 )
 
@@ -60,6 +64,46 @@ func init() {
 			return "disable"
 		}(),
 		DatabaseTimezone: os.Getenv("DATABASE_TIMEZONE"),
+		JWTSigningMethod: func() jwt.SigningMethod {
+			method := os.Getenv("JWT_SIGNING_METHOD")
+			switch method {
+			case "HS256":
+				return jwt.SigningMethodHS256
+			case "HS384":
+				return jwt.SigningMethodHS384
+			case "HS512":
+				return jwt.SigningMethodHS512
+			case "RS256":
+				return jwt.SigningMethodRS256
+			case "RS384":
+				return jwt.SigningMethodRS384
+			case "RS512":
+				return jwt.SigningMethodRS512
+			case "ES256":
+				return jwt.SigningMethodES256
+			case "ES384":
+				return jwt.SigningMethodES384
+			case "ES512":
+				return jwt.SigningMethodES512
+			case "PS256":
+				return jwt.SigningMethodPS256
+			case "PS384":
+				return jwt.SigningMethodPS384
+			case "PS512":
+				return jwt.SigningMethodPS512
+			default:
+				panic(fmt.Sprintf("JWT signing method %s is not allow", method))
+			}
+		}(),
+		JWTSigningKey: []byte(os.Getenv("JWT_SIGNING_KEY")),
+		JWTAllowMethod: func() authservice.AllowSigningMethod {
+			allow := authservice.AllowSigningMethod{}
+			for _, a := range strings.Split(os.Getenv("JWT_ALLOW_METHOD"), ",") {
+				a = strings.TrimSpace(a)
+				allow.Allowed(a)
+			}
+			return allow
+		}(),
 	}
 
 	log = logrus.WithField("app_name", options.AppName)

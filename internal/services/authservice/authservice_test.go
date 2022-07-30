@@ -194,3 +194,64 @@ func TestAuthService_ParseToken(t *testing.T) {
 		})
 	}
 }
+
+func TestAllowSigningMethod_Allowed(t *testing.T) {
+	type fields struct {
+		ECDSA   bool
+		Ed25519 bool
+		HMAC    bool
+		RSA     bool
+		RSAPSS  bool
+	}
+	type args struct {
+		k string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   *authservice.AllowSigningMethod
+	}{
+		{
+			name: "key exists",
+			args: args{
+				k: "ECDSA",
+			},
+			want: &authservice.AllowSigningMethod{
+				ECDSA:   true,
+				Ed25519: false,
+				HMAC:    false,
+				RSA:     false,
+				RSAPSS:  false,
+			},
+		},
+		{
+			name: "key not exists",
+			args: args{
+				k: "KEY",
+			},
+			want: &authservice.AllowSigningMethod{
+				ECDSA:   false,
+				Ed25519: false,
+				HMAC:    false,
+				RSA:     false,
+				RSAPSS:  false,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			a := &authservice.AllowSigningMethod{
+				ECDSA:   tt.fields.ECDSA,
+				Ed25519: tt.fields.Ed25519,
+				HMAC:    tt.fields.HMAC,
+				RSA:     tt.fields.RSA,
+				RSAPSS:  tt.fields.RSAPSS,
+			}
+			a.Allowed(tt.args.k)
+			if !reflect.DeepEqual(a, tt.want) {
+				t.Errorf("AllowSigningMethod.Allow() got = %v, want %v", a, tt.want)
+			}
+		})
+	}
+}

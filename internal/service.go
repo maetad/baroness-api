@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/pakkaparn/no-idea-api/internal/services/authservice"
+	"github.com/pakkaparn/no-idea-api/internal/services/userservice"
 	"github.com/sirupsen/logrus"
 )
 
@@ -15,6 +17,11 @@ var timeout = 10 * time.Second
 type Service struct {
 	Http *http.Server
 	log  *logrus.Entry
+}
+
+type internalService struct {
+	authservice authservice.AuthServiceInterface
+	userservice userservice.UserServiceInterface
 }
 
 func New(
@@ -48,7 +55,12 @@ func New(
 		log: l,
 	}
 
-	registerRouter(r)
+	services := internalService{
+		authservice: authservice.New(options.JWTSigningMethod, options.JWTSigningKey, options.JWTAllowMethod),
+		userservice: userservice.New(db),
+	}
+
+	registerRouter(r, l, services)
 
 	return &svc, nil
 }
