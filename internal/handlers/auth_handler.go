@@ -44,20 +44,20 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	)
 
 	if user, err = h.userservice.GetByUsername(req.Username); err != nil {
-		h.log.WithError(err)
+		h.log.WithError(err).Errorf("Login(): h.userservice.GetByUsername error %v", err)
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
 	if err = user.ValidatePassword(req.Password); err != nil {
-		h.log.WithError(err)
+		h.log.WithError(err).Errorf("Login(): user.ValidatePassword error %v", err)
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
 	token, err := h.authservice.GenerateToken(user.(*userservice.User), h.options.JWTExpiredIn)
 	if err != nil {
-		h.log.WithError(err)
+		h.log.WithError(err).Errorf("Login(): h.authservice.GenerateToken error %v", err)
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
