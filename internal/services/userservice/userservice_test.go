@@ -5,13 +5,14 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/pakkaparn/no-idea-api/internal/database"
 	"github.com/pakkaparn/no-idea-api/internal/services/userservice"
 	"github.com/pakkaparn/no-idea-api/mocks"
 	"github.com/stretchr/testify/mock"
 	"gorm.io/gorm"
 )
 
-var db = &mocks.UserServiceDatabaseInterface{}
+var db = &mocks.DatabaseInterface{}
 
 func TestNew(t *testing.T) {
 	tests := []struct {
@@ -32,7 +33,7 @@ func TestNew(t *testing.T) {
 
 func TestUserService_Create(t *testing.T) {
 	type fields struct {
-		db userservice.UserServiceDatabaseInterface
+		db database.DatabaseInterface
 	}
 	type args struct {
 		r userservice.UserCreateRequest
@@ -122,7 +123,7 @@ func TestUserService_Create(t *testing.T) {
 
 func TestUserService_GetByUsername(t *testing.T) {
 	type fields struct {
-		db userservice.UserServiceDatabaseInterface
+		db database.DatabaseInterface
 	}
 	type args struct {
 		username string
@@ -191,7 +192,7 @@ func TestUserService_GetByUsername(t *testing.T) {
 
 func TestUserService_List(t *testing.T) {
 	type fields struct {
-		db userservice.UserServiceDatabaseInterface
+		db database.DatabaseInterface
 	}
 	tests := []struct {
 		name    string
@@ -202,7 +203,7 @@ func TestUserService_List(t *testing.T) {
 		{
 			name: "listed success",
 			fields: func() fields {
-				db := &mocks.UserServiceDatabaseInterface{}
+				db := &mocks.DatabaseInterface{}
 				db.On("Find", mock.Anything).
 					Return(&gorm.DB{
 						Error: nil,
@@ -215,7 +216,7 @@ func TestUserService_List(t *testing.T) {
 		{
 			name: "listed fail",
 			fields: func() fields {
-				db := &mocks.UserServiceDatabaseInterface{}
+				db := &mocks.DatabaseInterface{}
 				db.On("Find", mock.Anything).
 					Return(&gorm.DB{
 						Error: errors.New("find error"),
@@ -243,7 +244,7 @@ func TestUserService_List(t *testing.T) {
 
 func TestUserService_Get(t *testing.T) {
 	type fields struct {
-		db userservice.UserServiceDatabaseInterface
+		db database.DatabaseInterface
 	}
 	type args struct {
 		id uint
@@ -258,7 +259,7 @@ func TestUserService_Get(t *testing.T) {
 		{
 			name: "user found",
 			fields: func() fields {
-				db := &mocks.UserServiceDatabaseInterface{}
+				db := &mocks.DatabaseInterface{}
 				db.On("First", mock.AnythingOfType("*userservice.User"), uint(1)).
 					Return(&gorm.DB{
 						Error: nil,
@@ -274,7 +275,7 @@ func TestUserService_Get(t *testing.T) {
 		{
 			name: "user not found",
 			fields: func() fields {
-				db := &mocks.UserServiceDatabaseInterface{}
+				db := &mocks.DatabaseInterface{}
 				db.On("First", mock.AnythingOfType("*userservice.User"), uint(1)).
 					Return(&gorm.DB{
 						Error: errors.New("user not found"),
@@ -305,7 +306,7 @@ func TestUserService_Get(t *testing.T) {
 
 func TestUserService_Update(t *testing.T) {
 	type fields struct {
-		db userservice.UserServiceDatabaseInterface
+		db database.DatabaseInterface
 	}
 	type args struct {
 		user userservice.UserInterface
@@ -321,7 +322,7 @@ func TestUserService_Update(t *testing.T) {
 		{
 			name: "update with password",
 			fields: func() fields {
-				db := &mocks.UserServiceDatabaseInterface{}
+				db := &mocks.DatabaseInterface{}
 				db.On("Save", mock.AnythingOfType("*userservice.User")).
 					Return(&gorm.DB{
 						Error: nil,
@@ -346,7 +347,7 @@ func TestUserService_Update(t *testing.T) {
 		{
 			name: "update with out password",
 			fields: func() fields {
-				db := &mocks.UserServiceDatabaseInterface{}
+				db := &mocks.DatabaseInterface{}
 				db.On("Save", mock.AnythingOfType("*userservice.User")).
 					Return(&gorm.DB{
 						Error: nil,
@@ -370,7 +371,7 @@ func TestUserService_Update(t *testing.T) {
 		{
 			name: "update error",
 			fields: func() fields {
-				db := &mocks.UserServiceDatabaseInterface{}
+				db := &mocks.DatabaseInterface{}
 				db.On("Save", mock.AnythingOfType("*userservice.User")).
 					Return(&gorm.DB{
 						Error: errors.New("update error"),
@@ -419,7 +420,7 @@ func TestUserService_Update(t *testing.T) {
 
 func TestUserService_Delete(t *testing.T) {
 	type fields struct {
-		db userservice.UserServiceDatabaseInterface
+		db database.DatabaseInterface
 	}
 	type args struct {
 		user userservice.UserInterface
@@ -433,7 +434,7 @@ func TestUserService_Delete(t *testing.T) {
 		{
 			name: "delete success",
 			fields: func() fields {
-				db := &mocks.UserServiceDatabaseInterface{}
+				db := &mocks.DatabaseInterface{}
 				db.On("Delete", mock.AnythingOfType("*userservice.User")).
 					Return(&gorm.DB{
 						Error: nil,
@@ -447,7 +448,7 @@ func TestUserService_Delete(t *testing.T) {
 		{
 			name: "delete fail",
 			fields: func() fields {
-				db := &mocks.UserServiceDatabaseInterface{}
+				db := &mocks.DatabaseInterface{}
 				db.On("Delete", mock.AnythingOfType("*userservice.User")).
 					Return(&gorm.DB{
 						Error: errors.New("delete fail"),

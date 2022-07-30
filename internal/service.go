@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/pakkaparn/no-idea-api/internal/config"
+	"github.com/pakkaparn/no-idea-api/internal/database"
 	"github.com/pakkaparn/no-idea-api/internal/services/authservice"
 	"github.com/pakkaparn/no-idea-api/internal/services/userservice"
 	"github.com/sirupsen/logrus"
@@ -32,9 +33,9 @@ func New(
 
 	r := gin.Default()
 
-	db, err := dbConnect(options)
+	db, err := database.Connect(options)
 	if err != nil {
-		log.WithError(err).Fatal("dbConnect()")
+		log.WithError(err).Fatal("database.Connect()")
 	}
 
 	sqlDB, err := db.DB()
@@ -42,8 +43,8 @@ func New(
 		log.WithError(err).Fatal("db.DB()")
 	}
 
-	if err = dbAutoMigration(sqlDB); err != nil {
-		log.WithError(err).Fatal("dbAutoMigration()")
+	if err = database.AutoMigration(sqlDB); err != nil {
+		log.WithError(err).Fatal("database.AutoMigration()")
 	}
 
 	svc := Service{

@@ -1,4 +1,4 @@
-package internal
+package database
 
 import (
 	"database/sql"
@@ -12,7 +12,15 @@ import (
 	"gorm.io/gorm"
 )
 
-func dbConnect(options config.Options) (*gorm.DB, error) {
+type DatabaseInterface interface {
+	Create(value interface{}) (tx *gorm.DB)
+	First(dest interface{}, conds ...interface{}) (tx *gorm.DB)
+	Find(dest interface{}, conds ...interface{}) (tx *gorm.DB)
+	Save(value interface{}) (tx *gorm.DB)
+	Delete(value interface{}, conds ...interface{}) (tx *gorm.DB)
+}
+
+func Connect(options config.Options) (*gorm.DB, error) {
 	dsn := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%d sslmode=%s TimeZone=%s",
 		options.DatabaseHost,
@@ -27,7 +35,7 @@ func dbConnect(options config.Options) (*gorm.DB, error) {
 	return gorm.Open(postgres.Open(dsn), &gorm.Config{})
 }
 
-func dbAutoMigration(sqlDB *sql.DB) error {
+func AutoMigration(sqlDB *sql.DB) error {
 	driver, err := migratepg.WithInstance(sqlDB, &migratepg.Config{})
 	if err != nil {
 		return err

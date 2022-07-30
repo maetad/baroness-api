@@ -1,17 +1,11 @@
 package userservice
 
-import "gorm.io/gorm"
-
-type UserServiceDatabaseInterface interface {
-	Create(value interface{}) (tx *gorm.DB)
-	First(dest interface{}, conds ...interface{}) (tx *gorm.DB)
-	Find(dest interface{}, conds ...interface{}) (tx *gorm.DB)
-	Save(value interface{}) (tx *gorm.DB)
-	Delete(value interface{}, conds ...interface{}) (tx *gorm.DB)
-}
+import (
+	"github.com/pakkaparn/no-idea-api/internal/database"
+)
 
 type UserService struct {
-	db UserServiceDatabaseInterface
+	db database.DatabaseInterface
 }
 
 type UserServiceInterface interface {
@@ -23,7 +17,7 @@ type UserServiceInterface interface {
 	Delete(user UserInterface) error
 }
 
-func New(db UserServiceDatabaseInterface) UserServiceInterface {
+func New(db database.DatabaseInterface) UserServiceInterface {
 	return UserService{db}
 }
 
