@@ -72,7 +72,7 @@ func registerRouter(
 			stateRoute.DELETE("/:state_id", stateHandler.Get, stateHandler.Delete)
 		}
 
-		transitionHandler := handlers.NewStateHandler(l, services.stateservice)
+		transitionHandler := handlers.NewTransitionHandler(l, services.transitionservice)
 		transitionRoute := authorized.Group("/events/:event_id/workflows/:workflow_id/transitions")
 		transitionRoute.Use(workflowHandler.Get)
 		{
