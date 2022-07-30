@@ -3,7 +3,7 @@ package model
 type State struct {
 	Model
 	WorkflowID uint     `json:"workflow_id"`
-	Workflow   Workflow `json:"event" gorm:"foreignkey:WorkflowID"`
+	Workflow   Workflow `json:"workflow" gorm:"foreignkey:WorkflowID"`
 	Name       string   `json:"name"`
 	Author
 }
