@@ -2,6 +2,7 @@
     "conventionalCommits.scopes": [
         "structure",
         "user",
-        "auth"
+        "auth",
+        "file"
     ]
 }
