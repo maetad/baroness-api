@@ -7,6 +7,7 @@ type UserServiceDatabaseInterface interface {
 	First(dest interface{}, conds ...interface{}) (tx *gorm.DB)
 	Find(dest interface{}, conds ...interface{}) (tx *gorm.DB)
 	Save(value interface{}) (tx *gorm.DB)
+	Delete(value interface{}, conds ...interface{}) (tx *gorm.DB)
 }
 
 type UserService struct {
@@ -19,6 +20,7 @@ type UserServiceInterface interface {
 	Get(id uint) (UserInterface, error)
 	GetByUsername(username string) (UserInterface, error)
 	Update(user UserInterface, r UserUpdateRequest) (UserInterface, error)
+	Delete(user UserInterface) error
 }
 
 func New(db UserServiceDatabaseInterface) UserServiceInterface {
@@ -89,4 +91,9 @@ func (s UserService) Update(user UserInterface, r UserUpdateRequest) (UserInterf
 	}
 
 	return u, nil
+}
+
+func (s UserService) Delete(user UserInterface) error {
+	result := s.db.Delete(user)
+	return result.Error
 }

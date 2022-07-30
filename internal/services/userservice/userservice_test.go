@@ -416,3 +416,56 @@ func TestUserService_Update(t *testing.T) {
 		})
 	}
 }
+
+func TestUserService_Delete(t *testing.T) {
+	type fields struct {
+		db userservice.UserServiceDatabaseInterface
+	}
+	type args struct {
+		user userservice.UserInterface
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "delete success",
+			fields: func() fields {
+				db := &mocks.UserServiceDatabaseInterface{}
+				db.On("Delete", mock.AnythingOfType("*userservice.User")).
+					Return(&gorm.DB{
+						Error: nil,
+					})
+				return fields{db}
+			}(),
+			args: args{
+				user: &userservice.User{},
+			},
+		},
+		{
+			name: "delete fail",
+			fields: func() fields {
+				db := &mocks.UserServiceDatabaseInterface{}
+				db.On("Delete", mock.AnythingOfType("*userservice.User")).
+					Return(&gorm.DB{
+						Error: errors.New("delete fail"),
+					})
+				return fields{db}
+			}(),
+			args: args{
+				user: &userservice.User{},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := userservice.New(tt.fields.db)
+			if err := s.Delete(tt.args.user); (err != nil) != tt.wantErr {
+				t.Errorf("UserService.Delete() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

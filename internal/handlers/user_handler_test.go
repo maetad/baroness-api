@@ -560,3 +560,155 @@ func TestUserHandler_Update(t *testing.T) {
 		})
 	}
 }
+
+func TestUserHandler_Delete(t *testing.T) {
+	type fields struct {
+		log         *logrus.Entry
+		userservice userservice.UserServiceInterface
+	}
+	type args struct {
+		c *gin.Context
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   int
+	}{
+		{
+			name: "user delete success",
+			fields: func() fields {
+				user := &userservice.User{}
+				u := &mocks.UserServiceInterface{}
+
+				u.On("Get", uint(1)).Return(user, nil)
+				u.On("Delete", user).Return(nil)
+
+				return fields{
+					log:         logrus.WithContext(context.TODO()),
+					userservice: u,
+				}
+			}(),
+			args: func() args {
+				w := httptest.NewRecorder()
+				c, _ := gin.CreateTestContext(w)
+
+				c.Request = &http.Request{
+					URL:    &url.URL{},
+					Header: make(http.Header),
+				}
+
+				c.Params = gin.Params{
+					{
+						Key:   "id",
+						Value: "1",
+					},
+				}
+
+				return args{c}
+			}(),
+			want: http.StatusNoContent,
+		},
+		{
+			name: "user not found",
+			fields: func() fields {
+				u := &mocks.UserServiceInterface{}
+				u.On("Get", uint(1)).Return(nil, errors.New("user not found"))
+
+				return fields{
+					log:         logrus.WithContext(context.TODO()),
+					userservice: u,
+				}
+			}(),
+			args: func() args {
+				w := httptest.NewRecorder()
+				c, _ := gin.CreateTestContext(w)
+
+				c.Request = &http.Request{
+					URL:    &url.URL{},
+					Header: make(http.Header),
+				}
+
+				c.Params = gin.Params{
+					{
+						Key:   "id",
+						Value: "1",
+					},
+				}
+
+				return args{c}
+			}(),
+			want: http.StatusNotFound,
+		},
+		{
+			name: "user delete fail",
+			fields: func() fields {
+				user := &userservice.User{}
+				u := &mocks.UserServiceInterface{}
+
+				u.On("Get", uint(1)).Return(user, nil)
+				u.On("Delete", user).Return(errors.New("delete fail"))
+
+				return fields{
+					log:         logrus.WithContext(context.TODO()),
+					userservice: u,
+				}
+			}(),
+			args: func() args {
+				w := httptest.NewRecorder()
+				c, _ := gin.CreateTestContext(w)
+
+				c.Request = &http.Request{
+					URL:    &url.URL{},
+					Header: make(http.Header),
+				}
+
+				c.Params = gin.Params{
+					{
+						Key:   "id",
+						Value: "1",
+					},
+				}
+
+				return args{c}
+			}(),
+			want: http.StatusInternalServerError,
+		},
+		{
+			name: "user id invalid",
+			fields: func() fields {
+				return fields{
+					log: logrus.WithContext(context.TODO()),
+				}
+			}(),
+			args: func() args {
+				w := httptest.NewRecorder()
+				c, _ := gin.CreateTestContext(w)
+
+				c.Request = &http.Request{
+					URL:    &url.URL{},
+					Header: make(http.Header),
+				}
+
+				c.Params = gin.Params{
+					{
+						Key:   "id",
+						Value: "one",
+					},
+				}
+
+				return args{c}
+			}(),
+			want: http.StatusNotFound,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			h := handlers.NewUserHandler(
+				tt.fields.log,
+				tt.fields.userservice,
+			)
+			h.Delete(tt.args.c)
+		})
+	}
+}

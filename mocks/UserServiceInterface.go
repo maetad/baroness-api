@@ -35,6 +35,20 @@ func (_m *UserServiceInterface) Create(r userservice.UserCreateRequest) (userser
 	return r0, r1
 }
 
+// Delete provides a mock function with given fields: user
+func (_m *UserServiceInterface) Delete(user userservice.UserInterface) error {
+	ret := _m.Called(user)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(userservice.UserInterface) error); ok {
+		r0 = rf(user)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // Get provides a mock function with given fields: id
 func (_m *UserServiceInterface) Get(id uint) (userservice.UserInterface, error) {
 	ret := _m.Called(id)
@@ -118,7 +132,7 @@ func (_m *UserServiceInterface) Update(user userservice.UserInterface, r userser
 	}
 
 	var r1 error
-			if rf, ok := ret.Get(1).(func(userservice.UserInterface, userservice.UserUpdateRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(userservice.UserInterface, userservice.UserUpdateRequest) error); ok {
 		r1 = rf(user, r)
 	} else {
 		r1 = ret.Error(1)
