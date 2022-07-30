@@ -6,6 +6,7 @@
         "file",
         "event",
         "workflow",
-        "state"
+        "state",
+        "transitions"
     ]
 }
