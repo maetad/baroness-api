@@ -149,6 +149,7 @@ func TestFieldHandler_Create(t *testing.T) {
 				u := &mocks.FieldServiceInterface{}
 				u.On("Create", fieldservice.FieldCreateRequest{
 					Name: "field name",
+					Type: "text",
 				}, mock.Anything).Return(&model.Field{}, nil)
 				return fields{
 					fieldservice: u,
@@ -162,7 +163,7 @@ func TestFieldHandler_Create(t *testing.T) {
 				c.Request = &http.Request{
 					URL:    &url.URL{},
 					Header: make(http.Header),
-					Body:   io.NopCloser(strings.NewReader(`{"name":"field name","platform":["platform 1", "platform 2"],"channel":["channel 1", "channel 2"]}`)),
+					Body:   io.NopCloser(strings.NewReader(`{"name":"field name","type":"text"}`)),
 				}
 
 				c.Set("user", &model.User{})
@@ -191,7 +192,36 @@ func TestFieldHandler_Create(t *testing.T) {
 				c.Request = &http.Request{
 					URL:    &url.URL{},
 					Header: make(http.Header),
-					Body:   io.NopCloser(strings.NewReader(`{"name": 1`)),
+					Body:   io.NopCloser(strings.NewReader(`{"name": 1,"type":"text"}`)),
+				}
+
+				c.Set("user", &model.User{})
+				c.Set("workflow", &model.Workflow{})
+
+				return args{c}
+			}(),
+			want: http.StatusUnprocessableEntity,
+		},
+		{
+			name: "field created fail type is not in enum",
+			fields: func() fields {
+				u := &mocks.FieldServiceInterface{}
+				u.On("Create", fieldservice.FieldCreateRequest{
+					Name: "field name",
+				}, mock.Anything).Return(&model.Field{}, nil)
+				return fields{
+					fieldservice: u,
+					log:          logrus.WithContext(context.TODO()),
+				}
+			}(),
+			args: func() args {
+				w := httptest.NewRecorder()
+				c, _ := gin.CreateTestContext(w)
+
+				c.Request = &http.Request{
+					URL:    &url.URL{},
+					Header: make(http.Header),
+					Body:   io.NopCloser(strings.NewReader(`{"name": "field name","type":"string"}`)),
 				}
 
 				c.Set("user", &model.User{})
@@ -207,6 +237,7 @@ func TestFieldHandler_Create(t *testing.T) {
 				u := &mocks.FieldServiceInterface{}
 				u.On("Create", fieldservice.FieldCreateRequest{
 					Name: "field name",
+					Type: "text",
 				}, mock.Anything).Return(nil, errors.New("create error"))
 				return fields{
 					fieldservice: u,
@@ -220,7 +251,7 @@ func TestFieldHandler_Create(t *testing.T) {
 				c.Request = &http.Request{
 					URL:    &url.URL{},
 					Header: make(http.Header),
-					Body:   io.NopCloser(strings.NewReader(`{"name":"field name","platform":["platform 1", "platform 2"],"channel":["channel 1", "channel 2"]}`)),
+					Body:   io.NopCloser(strings.NewReader(`{"name":"field name","type":"text"}`)),
 				}
 
 				c.Set("user", &model.User{})
@@ -394,6 +425,7 @@ func TestFieldHandler_Update(t *testing.T) {
 					field,
 					fieldservice.FieldUpdateRequest{
 						Name: "new field name",
+						Type: "text",
 					},
 					mock.Anything,
 				).Return(&model.Field{
@@ -412,7 +444,7 @@ func TestFieldHandler_Update(t *testing.T) {
 				c.Request = &http.Request{
 					URL:    &url.URL{},
 					Header: make(http.Header),
-					Body:   io.NopCloser(strings.NewReader(`{"name":"new field name","platform":["platform 1","platform 2"],"channel":["channel 1", "channel 2"]}`)),
+					Body:   io.NopCloser(strings.NewReader(`{"name":"new field name","type":"text"}`)),
 				}
 
 				c.Params = gin.Params{
@@ -447,7 +479,7 @@ func TestFieldHandler_Update(t *testing.T) {
 				c.Request = &http.Request{
 					URL:    &url.URL{},
 					Header: make(http.Header),
-					Body:   io.NopCloser(strings.NewReader(`{"name":"new field name"}`)),
+					Body:   io.NopCloser(strings.NewReader(`{"name":"new field name","type":"text"}`)),
 				}
 
 				c.Params = gin.Params{
@@ -465,7 +497,7 @@ func TestFieldHandler_Update(t *testing.T) {
 			want: http.StatusNotFound,
 		},
 		{
-			name: "body invalid",
+			name: "field updated fail invalid payload",
 			args: func() args {
 				w := httptest.NewRecorder()
 				c, _ := gin.CreateTestContext(w)
@@ -474,6 +506,32 @@ func TestFieldHandler_Update(t *testing.T) {
 					URL:    &url.URL{},
 					Header: make(http.Header),
 					Body:   io.NopCloser(strings.NewReader(`{"name": 1}`)),
+				}
+
+				c.Params = gin.Params{
+					{
+						Key:   "field_id",
+						Value: "1",
+					},
+				}
+
+				c.Set("user", &model.User{})
+				c.Set("workflow", &model.Workflow{})
+
+				return args{c}
+			}(),
+			want: http.StatusUnprocessableEntity,
+		},
+		{
+			name: "field updated fail type is not enum",
+			args: func() args {
+				w := httptest.NewRecorder()
+				c, _ := gin.CreateTestContext(w)
+
+				c.Request = &http.Request{
+					URL:    &url.URL{},
+					Header: make(http.Header),
+					Body:   io.NopCloser(strings.NewReader(`{"name": "new field name","type": "string"}`)),
 				}
 
 				c.Params = gin.Params{
@@ -503,6 +561,7 @@ func TestFieldHandler_Update(t *testing.T) {
 					field,
 					fieldservice.FieldUpdateRequest{
 						Name: "new field name",
+						Type: "text",
 					},
 					mock.Anything,
 				).Return(nil, errors.New("update fail"))
@@ -519,7 +578,7 @@ func TestFieldHandler_Update(t *testing.T) {
 				c.Request = &http.Request{
 					URL:    &url.URL{},
 					Header: make(http.Header),
-					Body:   io.NopCloser(strings.NewReader(`{"name":"new field name","platform":["platform 1","platform 2"],"channel":["channel 1", "channel 2"]}`)),
+					Body:   io.NopCloser(strings.NewReader(`{"name":"new field name","type":"text"}`)),
 				}
 
 				c.Params = gin.Params{
@@ -545,7 +604,7 @@ func TestFieldHandler_Update(t *testing.T) {
 				c.Request = &http.Request{
 					URL:    &url.URL{},
 					Header: make(http.Header),
-					Body:   io.NopCloser(strings.NewReader(`{"name":"new field name"}`)),
+					Body:   io.NopCloser(strings.NewReader(`{"name":"new field name","type":"text"}`)),
 				}
 
 				c.Params = gin.Params{

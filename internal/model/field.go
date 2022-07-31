@@ -20,3 +20,12 @@ type Field struct {
 	Type       FieldType `json:"type"`
 	Author
 }
+
+func (t FieldType) IsValid() bool {
+	switch t {
+	case FieldTypeText, FieldTypeParagraph, FieldTypeDate, FieldTypeNumber, FieldTypeTimestamp, FieldTypeDropdown, FieldTypeCheckbox:
+		return true
+	}
+
+	return false
+}
